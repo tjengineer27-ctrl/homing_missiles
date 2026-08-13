@@ -56,24 +56,14 @@ scoreboard players operation #aoe_math aoe_math *= #aoe_math aoe_math
 scoreboard players operation @s aoe_distance += #aoe_math aoe_math
 
 # ------------------------------------------------------------
-# DEBUG - VERIFY SOURCE SCORE IN TARGET CONTEXT
-# ------------------------------------------------------------
-
-execute if score #active_controller controller_id matches 1.. run say [AOE DEBUG] SOURCE CONTROLLER SCORE EXISTS
-
-execute unless score #active_controller controller_id matches 1.. run say [AOE DEBUG] SOURCE CONTROLLER SCORE MISSING
-
-# ------------------------------------------------------------
-# DEBUG - TEST AOE ASSIGNMENT
+# AOE ASSIGNMENT TEST
 # ------------------------------------------------------------
 
 execute if score @s aoe_distance <= #active_aoe_radius aoe_radius_squared run say [AOE DEBUG] TARGET IS INSIDE RADIUS
 
 execute if score @s aoe_distance <= #active_aoe_radius aoe_radius_squared run scoreboard players set @s aoe_controller_id 999
 
-execute if score @s aoe_controller_id matches 999 run say [AOE DEBUG] TARGET ASSIGNMENT WORKED
-
-execute if score @s aoe_distance <= #active_aoe_radius aoe_radius_squared run say [AOE DEBUG] ASSIGNMENT ATTEMPTED
+execute if score @s aoe_controller_id matches 999 run say [AOE DEBUG] TARGET RECEIVED 999
 
 # ------------------------------------------------------------
 # DEBUG - AOE CONTROLLER ID TRANSFER

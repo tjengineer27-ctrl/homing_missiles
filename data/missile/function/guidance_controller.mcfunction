@@ -104,6 +104,8 @@ execute if entity @s[tag=guidance_at_target,tag=!missile_impact] run tag @s add 
 
 execute if entity @s[tag=missile_impact,tag=!aoe_detection_complete] run function missile:aoe_detection
 
+execute as @e[type=#missile:valid_targets] if score @s aoe_controller_id = #active_controller controller_id run say [STAGE 1] TARGET STILL ASSIGNED
+
 execute if entity @s[tag=missile_impact,tag=!aoe_detection_complete] as @e[type=#missile:valid_targets] if score @s aoe_controller_id = #active_controller controller_id run say AOE TARGET MARKED
 
 # ------------------------------------------------------------
@@ -116,7 +118,11 @@ execute if entity @s[tag=missile_impact,tag=!aoe_detection_complete] run tag @s 
 # SHARED PRIMARY TARGET DAMAGE
 # ------------------------------------------------------------
 
-execute if entity @s[tag=missile_impact] run function missile:yield_damage
+execute as @e[type=#missile:valid_targets] if score @s aoe_controller_id = #active_controller controller_id run say [STAGE 2] TARGET STILL ASSIGNED
+
+execute if score #active_controller controller_id matches 1.. run say [STAGE 2.5] ACTIVE CONTROLLER STILL EXISTS
+
+scoreboard players get #active_controller controller_id
 
 # ------------------------------------------------------------
 # WARHEAD PROCESSING DEBUG
@@ -125,6 +131,8 @@ execute if entity @s[tag=missile_impact] run function missile:yield_damage
 execute if entity @s[tag=missile_impact] run say WARHEAD CALL CONDITION PASSED
 
 execute if entity @s[tag=missile_impact] run function missile:warhead
+
+execute as @e[type=#missile:valid_targets] if score @s aoe_controller_id = #active_controller controller_id run say [STAGE 3] TARGET STILL ASSIGNED
 
 # ------------------------------------------------------------
 # CLEANUP DETONATED MISSILE

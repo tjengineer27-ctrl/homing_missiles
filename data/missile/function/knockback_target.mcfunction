@@ -150,7 +150,7 @@ execute if score @s warhead_yield matches 3 run scoreboard players set #knockbac
 # ------------------------------------------------------------
 
 # Copy this target's controller ID
-scoreboard players operation #active_controller controller_id = @s aoe_controller
+scoreboard players operation #active_controller controller_id = @s aoe_controller_id
 
 # Resolve the matching missile controller
 execute as @e[type=minecraft:marker,tag=missile_controller] if score @s controller_id = #active_controller controller_id run scoreboard players operation #knockback_magnitude knockback_scale = #active_yield_knockback knockback_scale

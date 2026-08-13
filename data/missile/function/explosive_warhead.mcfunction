@@ -2,6 +2,8 @@
 # HOMING MISSILE - EXPLOSIVE WARHEAD
 # ============================================================
 
+say [EXPLOSIVE DEBUG] EXPLOSIVE WARHEAD FUNCTION ENTERED
+
 # ------------------------------------------------------------
 # LOAD THIS CONTROLLER'S PRIMARY TARGET ID
 # ------------------------------------------------------------
@@ -62,19 +64,25 @@ function missile:yield_aoe_damage
 
 say KNOCKBACK DISPATCH REACHED
 
-execute as @e[type=#missile:valid_targets] run say TARGET FOUND FOR KNOCKBACK
-
 execute as @e[type=#missile:valid_targets] run tellraw @a [{"text":"[KB DEBUG] Target: ","color":"yellow"},{"selector":"@s"},{"text":" | AOE Controller ID: ","color":"white"},{"score":{"name":"@s","objective":"aoe_controller_id"},"color":"green"}]
 
 tellraw @a [{"text":"[KB DEBUG] Active Controller ID: ","color":"white"},{"score":{"name":"#active_controller","objective":"controller_id"},"color":"aqua"}]
 
-# ------------------------------------------------------------
-# KNOCKBACK TARGETS
-# ------------------------------------------------------------
+# ============================================================
+# KNOCKBACK DISPATCH DEBUG
+# ============================================================
 
-execute if score #active_controller controller_id matches 1.. run say ACTIVE CONTROLLER HAS AN ID
+say [KB DEBUG] BEGIN KNOCKBACK TARGET SCAN
 
-execute as @e[type=#missile:valid_targets] run execute if score @s aoe_controller_id matches 1.. run say TARGET HAS A CONTROLLER ID
+execute as @e[type=#missile:valid_targets] run scoreboard players get @s aoe_controller_id
+
+scoreboard players get #active_controller controller_id
+
+execute as @e[type=#missile:valid_targets] if score @s aoe_controller_id matches 1.. run say [KB DEBUG] TARGET HAS NONZERO AOE ID
+
+execute as @e[type=#missile:valid_targets] if score @s aoe_controller_id = #active_controller controller_id run say [KB DEBUG] CONTROLLER ID MATCH
+
+execute as @e[type=#missile:valid_targets] if score @s aoe_controller_id = #active_controller controller_id run function missile:knockback_targetmissile:knockback_target
 
 # ------------------------------------------------------------
 # EXPLOSION FLASH
