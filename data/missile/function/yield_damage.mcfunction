@@ -12,7 +12,7 @@ scoreboard players operation #debug_primary_damage debug_damage = @s yield_prima
 
 execute if score @s yield_primary_damage matches 10 run say PRIMARY DAMAGE = 10
 
-execute if score @s yield_primary_damage matches 10 as @e[type=#missile:valid_targets] if score @s target_id = #resolution_target target_id run damage @s 10 minecraft:generic
+execute if score @s yield_primary_damage matches 10 as @e[type=#missile:valid_targets] if score @s target_id = #resolution_target target_id run damage @s 1 minecraft:generic
 
 # ------------------------------------------------------------
 # MEDIUM YIELD

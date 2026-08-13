@@ -124,6 +124,14 @@ scoreboard players operation #knockback_math knockback_scale /= #knockback_dista
 scoreboard players operation #knockback_distance_root knockback_scale += #knockback_math knockback_scale
 scoreboard players operation #knockback_distance_root knockback_scale /= #scale_2 knockback_scale
 
+# ============================================================
+# DEBUG - VECTOR / DISTANCE
+# ============================================================
+
+tellraw @a [{"text":"[KB MATH] DX: ","color":"yellow"},{"score":{"name":"#knockback_dx","objective":"knockback_dx"}},{"text":" DY: ","color":"yellow"},{"score":{"name":"#knockback_dy","objective":"knockback_dy"}},{"text":" DZ: ","color":"yellow"},{"score":{"name":"#knockback_dz","objective":"knockback_dz"}}]
+
+tellraw @a [{"text":"[KB MATH] DIST²: ","color":"aqua"},{"score":{"name":"#knockback_distance","objective":"knockback_distance"}},{"text":" ROOT: ","color":"aqua"},{"score":{"name":"#knockback_distance_root","objective":"knockback_scale"}}]
+
 # ------------------------------------------------------------
 # SELECT YIELD MULTIPLIER
 # ------------------------------------------------------------
@@ -143,7 +151,7 @@ execute if score @s warhead_yield matches 3 run scoreboard players set #knockbac
 #
 # @s is the AOE target at this point.
 #
-# The target stores the controller ID in aoe_controller.
+# The target stores the controller ID in aoe_controller_id.
 # We first copy that ID into a temporary global score, then
 # resolve the matching missile_controller marker and retrieve
 # its yield_knockback value.
@@ -254,6 +262,14 @@ execute if score #knockback_distance knockback_distance <= #kb_20 knockback_scal
 scoreboard players operation #knockback_magnitude knockback_scale *= #knockback_falloff knockback_scale
 scoreboard players operation #knockback_magnitude knockback_scale /= #scale_1000 knockback_scale
 
+# ============================================================
+# DEBUG - FALLOFF RESULT
+# ============================================================
+
+tellraw @a [{"text":"[KB MATH] MAGNITUDE: ","color":"green"},{"score":{"name":"#knockback_magnitude","objective":"knockback_scale"}},{"text":" FALLOFF: ","color":"green"},{"score":{"name":"#knockback_falloff","objective":"knockback_scale"}}]
+
+tellraw @a [{"text":"[KB MATH] KB20: ","color":"white"},{"score":{"name":"#kb_20","objective":"knockback_scale"}},{"text":" KB40: ","color":"white"},{"score":{"name":"#kb_40","objective":"knockback_scale"}},{"text":" KB60: ","color":"white"},{"score":{"name":"#kb_60","objective":"knockback_scale"}},{"text":" KB80: ","color":"white"},{"score":{"name":"#kb_80","objective":"knockback_scale"}}]
+
 # ------------------------------------------------------------
 # VECTOR NORMALIZATION
 #
@@ -301,6 +317,12 @@ scoreboard players operation #knockback_vy knockback_scale /= #scale_1000 knockb
 
 scoreboard players operation #knockback_vz knockback_scale *= #knockback_magnitude knockback_scale
 scoreboard players operation #knockback_vz knockback_scale /= #scale_1000 knockback_scale
+
+# ============================================================
+# DEBUG - FINAL KNOCKBACK VECTOR
+# ============================================================
+
+tellraw @a [{"text":"[KB VECTOR] VX: ","color":"gold"},{"score":{"name":"#knockback_vx","objective":"knockback_scale"}},{"text":" VY: ","color":"gold"},{"score":{"name":"#knockback_vy","objective":"knockback_scale"}},{"text":" VZ: ","color":"gold"},{"score":{"name":"#knockback_vz","objective":"knockback_scale"}}]
 
 # ------------------------------------------------------------
 # APPLY EXPLOSION UPWARD BIAS

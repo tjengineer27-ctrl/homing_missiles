@@ -1,8 +1,14 @@
 # ============================================================
-# HOMING MISSILE - EXPLOSIVE WARHEAD
+# EXPLOSIVE WARHEAD
 # ============================================================
 
-say [EXPLOSIVE DEBUG] EXPLOSIVE WARHEAD FUNCTION ENTERED
+tellraw @a {"text":"[EXPLOSIVE DEBUG] EXPLOSIVE WARHEAD ENTERED","color":"gold"}
+
+# ------------------------------------------------------------
+# VERIFY YIELD
+# ------------------------------------------------------------
+
+execute if score @s warhead_yield matches 1 run tellraw @a {"text":"[EXPLOSIVE DEBUG] LOW YIELD SELECTED","color":"yellow"}
 
 # ------------------------------------------------------------
 # LOAD THIS CONTROLLER'S PRIMARY TARGET ID
@@ -82,7 +88,7 @@ execute as @e[type=#missile:valid_targets] if score @s aoe_controller_id matches
 
 execute as @e[type=#missile:valid_targets] if score @s aoe_controller_id = #active_controller controller_id run say [KB DEBUG] CONTROLLER ID MATCH
 
-execute as @e[type=#missile:valid_targets] if score @s aoe_controller_id = #active_controller controller_id run function missile:knockback_targetmissile:knockback_target
+execute as @e[type=#missile:valid_targets] if score @s aoe_controller_id = #active_controller controller_id run function missile:knockback_target
 
 # ------------------------------------------------------------
 # EXPLOSION FLASH
