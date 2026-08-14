@@ -164,6 +164,12 @@ scoreboard objectives add debug_damage dummy
 
 scoreboard players set #scale_2 knockback_scale 2
 
+# ============================================================
+# CROSSHAIR TARGETING SYSTEM
+# ============================================================
+
+scoreboard objectives add crosshair_target_id dummy
+
 # Global controller counter
 
 scoreboard players set #next_controller_id controller_id 0

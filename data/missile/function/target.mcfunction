@@ -6,7 +6,7 @@
 # FIND VALID TARGET
 # ============================================================
 
-execute as @e[type=minecraft:firework_rocket,tag=homing_missile,tag=needs_target] at @s if entity @e[type=#missile:valid_targets,distance=..64,sort=nearest,limit=1] run tag @s add has_target
+execute as @e[type=minecraft:firework_rocket,tag=homing_missile,tag=needs_target] at @s if entity @e[type=#missile:valid_targets,distance=..128,sort=nearest,limit=1] run tag @s add has_target
 
 
 # ============================================================
