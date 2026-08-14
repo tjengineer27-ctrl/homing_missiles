@@ -61,7 +61,7 @@ execute as @e[type=minecraft:marker,tag=missile_controller,tag=controller_id_ass
 # COPY POTION SUBTYPE
 # ------------------------------------------------------------
 
-execute as @e[type=minecraft:marker,tag=missile_controller,tag=controller_id_assigned,tag=!potion_subtype_assigned] run scoreboard players operation @s potion_subtype = #config_potion missile_config
+execute as @e[type=minecraft:marker,tag=missile_controller,tag=controller_id_assigned,tag=!potion_subtype_assigned] run scoreboard players operation @s potion_type = #config_potion missile_config
 
 
 # ============================================================

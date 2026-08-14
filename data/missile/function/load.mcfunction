@@ -99,6 +99,9 @@ scoreboard players set #knockback_upward_bias knockback_scale 500
 
 scoreboard objectives add warhead_type dummy
 scoreboard objectives add potion_type dummy
+scoreboard objectives add potion_subtype dummy
+
+scoreboard players set #active_potion_type potion_subtype 0
 
 # ============================================================
 # WARHEAD YIELD SYSTEM

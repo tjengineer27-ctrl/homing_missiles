@@ -3,6 +3,12 @@
 # ============================================================
 
 # ------------------------------------------------------------
+# RESET CONFIGURATION STATUS
+# ------------------------------------------------------------
+
+scoreboard players set #config_status missile_config 0
+
+# ------------------------------------------------------------
 # VERIFY BASE WARHEAD
 # ------------------------------------------------------------
 
@@ -18,10 +24,10 @@ execute unless score #config_yield missile_config matches 1..3 run say ERROR: NO
 # VERIFY POTION SUBTYPE
 # ------------------------------------------------------------
 
-execute if score #config_warhead missile_config matches 4 unless score #config_potion missile_config matches 1..4 run say ERROR: NO POTION SUBTYPE SELECTED
+execute unless score #config_potion missile_config matches 1..4 run say ERROR: NO POTION SUBTYPE SELECTED
 
 # ------------------------------------------------------------
-# CALCULATE CONFIGURATION STATUS
+# FINALIZE ONLY IF EVERYTHING IS VALID
 # ------------------------------------------------------------
 
 execute if score #config_warhead missile_config matches 1..4 if score #config_yield missile_config matches 1..3 if score #config_potion missile_config matches 1..4 run scoreboard players set #config_status missile_config 1

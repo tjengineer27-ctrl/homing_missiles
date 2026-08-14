@@ -1,16 +1,19 @@
 # ============================================================
-# HOMING MISSILE - POISON III
+# HOMING MISSILE - POISON POTION WARHEAD
 # ============================================================
 
+say POISON WARHEAD ACTIVATED
+
 # ------------------------------------------------------------
-# APPLY POISON III
-#
+# APPLY YIELD-SCALED POISON III
+# ------------------------------------------------------------
+
 # LOW    = 20 seconds
 # MEDIUM = 40 seconds
 # HIGH   = 80 seconds
 #
-# Amplifier 2 = Poison III
-# ------------------------------------------------------------
+# Amplifier:
+# 2 = Poison III
 
 execute as @e[type=#missile:valid_targets] if score @s aoe_controller_id = #active_controller controller_id if score #active_warhead_yield warhead_yield matches 1 run effect give @s minecraft:poison 20 2 true
 
