@@ -5,26 +5,42 @@
 say POTION WARHEAD ACTIVATED
 
 # ------------------------------------------------------------
-# APPLY WITHER II
+# LOAD THIS CONTROLLER'S PRIMARY TARGET ID
 # ------------------------------------------------------------
 
-execute as @e[type=#missile:valid_targets] if score @s aoe_controller_id = #active_controller controller_id run effect give @s minecraft:wither 5 1 true
+scoreboard players operation #resolution_target target_id = @s impact_target_id
 
 # ------------------------------------------------------------
-# SMALL IMPACT BURST
+# CAPTURE CONTROLLER ID
+#
+# @s is still the missile controller here.
+# This MUST happen before dispatching into the potion subtype.
 # ------------------------------------------------------------
 
-particle minecraft:explosion ~ ~ ~ 0.2 0.2 0.2 0.05 8 force
+scoreboard players operation #active_controller controller_id = @s controller_id
 
 # ------------------------------------------------------------
-# BLACK POTION EFFECT BURST
+# CAPTURE POTION SETTINGS
 # ------------------------------------------------------------
 
-particle minecraft:entity_effect{color:[0.0,0.0,0.0,1.0]} ~ ~1 ~ 0.65 0.65 0.65 0.12 80 force
+scoreboard players operation #active_potion_type potion_type = @s potion_type
+
+scoreboard players operation #active_warhead_yield warhead_yield = @s warhead_yield
 
 # ------------------------------------------------------------
-# DENSE INNER BLACK SWIRL
+# DEBUG - CAPTURED POTION SETTINGS
 # ------------------------------------------------------------
 
-particle minecraft:entity_effect{color:[0.0,0.0,0.0,1.0]} ~ ~1 ~ 0.3 0.3 0.3 0.2 35 force
+tellraw @a [{"text":"[POTION DEBUG] Controller: ","color":"gold"},{"score":{"name":"#active_controller","objective":"controller_id"}},{"text":" | Type: ","color":"gold"},{"score":{"name":"#active_potion_type","objective":"potion_type"}},{"text":" | Yield: ","color":"gold"},{"score":{"name":"#active_warhead_yield","objective":"warhead_yield"}}]
 
+# ------------------------------------------------------------
+# DISPATCH POTION SUBTYPE
+# ------------------------------------------------------------
+
+execute if score #config_potion #config_potion missile_config matches 1 run function missile:wither_warhead
+
+execute if score #config_potion missile_config matches 2 run function missile:poison_warhead
+
+execute if score #config_potion missile_config matches 3 run function missile:slowness_warhead
+
+execute if score #config_potion missile_config matches 4 run function missile:weakness_warhead

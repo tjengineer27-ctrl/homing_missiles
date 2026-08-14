@@ -44,6 +44,16 @@ execute if score @s warhead_yield matches 3 run scoreboard players set #knockbac
 scoreboard players operation #active_yield_knockback knockback_scale *= #knockback_multiplier knockback_scale
 scoreboard players operation #active_yield_knockback knockback_scale /= #scale_1000 knockback_scale
 
+# ============================================================
+# KNOCKBACK DISPATCH
+# ============================================================
+
+execute as @e[type=#missile:valid_targets] run scoreboard players get @s aoe_controller_id
+
+scoreboard players get #active_controller controller_id
+
+execute as @e[type=#missile:valid_targets] if score @s aoe_controller_id = #active_controller controller_id run function missile:knockback_target
+
 # ------------------------------------------------------------
 # PRIMARY TARGET DAMAGE
 # ------------------------------------------------------------
@@ -65,57 +75,54 @@ function missile:yield_damage
 function missile:yield_aoe_damage
 
 # ------------------------------------------------------------
-# KNOCKBACK TARGET DEBUG
+# EXPLOSION EFFECTS
 # ------------------------------------------------------------
-
-say KNOCKBACK DISPATCH REACHED
-
-execute as @e[type=#missile:valid_targets] run tellraw @a [{"text":"[KB DEBUG] Target: ","color":"yellow"},{"selector":"@s"},{"text":" | AOE Controller ID: ","color":"white"},{"score":{"name":"@s","objective":"aoe_controller_id"},"color":"green"}]
-
-tellraw @a [{"text":"[KB DEBUG] Active Controller ID: ","color":"white"},{"score":{"name":"#active_controller","objective":"controller_id"},"color":"aqua"}]
 
 # ============================================================
-# KNOCKBACK DISPATCH DEBUG
+# LOW YIELD
 # ============================================================
 
-say [KB DEBUG] BEGIN KNOCKBACK TARGET SCAN
+execute if score @s warhead_yield matches 1 run particle minecraft:explosion_emitter ~ ~1 ~ 0 0 0 0 1 force
 
-execute as @e[type=#missile:valid_targets] run scoreboard players get @s aoe_controller_id
+execute if score @s warhead_yield matches 1 run particle minecraft:campfire_signal_smoke ~ ~1 ~ 0.35 0.25 0.35 0.005 60 force
 
-scoreboard players get #active_controller controller_id
+execute if score @s warhead_yield matches 1 run particle minecraft:lava ~ ~1 ~ 0.9 0.9 0.9 0.35 40 force
 
-execute as @e[type=#missile:valid_targets] if score @s aoe_controller_id matches 1.. run say [KB DEBUG] TARGET HAS NONZERO AOE ID
+execute if score @s warhead_yield matches 1 run particle minecraft:lava ~ ~1 ~ 0.6 0.6 0.6 0.5 25 force
 
-execute as @e[type=#missile:valid_targets] if score @s aoe_controller_id = #active_controller controller_id run say [KB DEBUG] CONTROLLER ID MATCH
 
-execute as @e[type=#missile:valid_targets] if score @s aoe_controller_id = #active_controller controller_id run function missile:knockback_target
+# ============================================================
+# MEDIUM YIELD
+# ============================================================
 
-# ------------------------------------------------------------
-# EXPLOSION FLASH
-# ------------------------------------------------------------
+execute if score @s warhead_yield matches 2 run particle minecraft:explosion_emitter ~ ~1 ~ 0 0 0 0 2 force
 
-particle minecraft:explosion_emitter ~ ~1 ~ 0 0 0 0 1 force
+execute if score @s warhead_yield matches 2 run particle minecraft:campfire_signal_smoke ~ ~1 ~ 0.4 0.3 0.4 0.005 100 force
 
-# ------------------------------------------------------------
-# THICK, SLOW-EXPANDING SMOKE CLOUD
-# ------------------------------------------------------------
+execute if score @s warhead_yield matches 2 run particle minecraft:lava ~ ~1 ~ 1.0 1.0 1.0 0.35 70 force
 
-particle minecraft:campfire_signal_smoke ~ ~1 ~ 0.35 0.25 0.35 0.005 60 force
+execute if score @s warhead_yield matches 2 run particle minecraft:lava ~ ~1 ~ 0.7 0.7 0.7 0.5 45 force
 
-# ------------------------------------------------------------
-# POWERFUL LAVA PARTICLE BURST
-# ------------------------------------------------------------
 
-particle minecraft:lava ~ ~1 ~ 0.9 0.9 0.9 0.35 40 force
+# ============================================================
+# HIGH YIELD
+# ============================================================
 
-# ------------------------------------------------------------
-# SECONDARY POWERFUL LAVA BURST
-# ------------------------------------------------------------
+execute if score @s warhead_yield matches 3 run particle minecraft:explosion_emitter ~ ~1 ~ 0 0 0 0 3 force
 
-particle minecraft:lava ~ ~1 ~ 0.6 0.6 0.6 0.5 25 force
+execute if score @s warhead_yield matches 3 run particle minecraft:campfire_signal_smoke ~ ~1 ~ 0.5 0.35 0.5 0.005 150 force
+
+execute if score @s warhead_yield matches 3 run particle minecraft:lava ~ ~1 ~ 1.2 1.2 1.2 0.35 100 force
+
+execute if score @s warhead_yield matches 3 run particle minecraft:lava ~ ~1 ~ 0.8 0.8 0.8 0.5 70 force
+
 
 # ------------------------------------------------------------
 # EXPLOSION SOUND
 # ------------------------------------------------------------
 
-execute at @s run playsound minecraft:entity.generic.explode master @a ~ ~ ~ 1 1
+execute if score @s warhead_yield matches 1 run playsound minecraft:entity.generic.explode master @a ~ ~ ~ 1 1
+
+execute if score @s warhead_yield matches 2 run playsound minecraft:entity.generic.explode master @a ~ ~ ~ 1.25 1
+
+execute if score @s warhead_yield matches 3 run playsound minecraft:entity.generic.explode master @a ~ ~ ~ 1.5 1

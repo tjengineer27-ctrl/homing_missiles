@@ -26,50 +26,37 @@ scoreboard players operation #knockback_dz knockback_dz = #target_z guidance_tz
 scoreboard players operation #knockback_dz knockback_dz -= #controller_z guidance_cz
 
 # ------------------------------------------------------------
-# CALCULATE DISTANCE SQUARED
+# CALCULATE 3D DISTANCE SQUARED
 #
 # Coordinates are x1000.
 # Therefore distance² is x1,000,000.
+#
+# This remains the distance used for AOE falloff.
 # ------------------------------------------------------------
 
 scoreboard players operation #knockback_distance knockback_distance = #knockback_dx knockback_dx
 scoreboard players operation #knockback_distance knockback_distance *= #knockback_dx knockback_dx
 
 scoreboard players operation #knockback_math knockback_math = #knockback_dy knockback_dy
-scoreboard players operation #knockback_math knockback_math *= #knockback_dy knockback_dy
+scoreboard players operation #knockback_math knockback_math *= #knockback_dy knockback_math
 scoreboard players operation #knockback_distance knockback_distance += #knockback_math knockback_math
 
 scoreboard players operation #knockback_math knockback_math = #knockback_dz knockback_dz
-scoreboard players operation #knockback_math knockback_math *= #knockback_dz knockback_dz
+scoreboard players operation #knockback_math knockback_math *= #knockback_dz knockback_math
 scoreboard players operation #knockback_distance knockback_distance += #knockback_math knockback_math
 
 # ------------------------------------------------------------
-# CALCULATE ACTUAL DISTANCE
+# CALCULATE ACTUAL 3D DISTANCE
 #
 # Newton-Raphson integer square root.
 #
-# distance² is x1,000,000.
-# distance root is x1000.
-#
-# Newton-Raphson:
-#
-#     root_new = (root + distance² / root) / 2
-#
-# Because:
-#
-#     distance² = x1,000,000
-#     root      = x1,000
-#     distance² / root = x1,000
-#
-# The iteration therefore stays at x1000 scale.
+# distance² = x1,000,000
+# distance root = x1,000
 # ------------------------------------------------------------
 
 # ------------------------------------------------------------
 # INITIAL APPROXIMATION
 # ------------------------------------------------------------
-
-# Convert distance² from x1,000,000 to an
-# initial approximation at x1000 scale.
 
 scoreboard players operation #knockback_distance_root knockback_scale = #knockback_distance knockback_distance
 scoreboard players operation #knockback_distance_root knockback_scale /= #scale_1000 knockback_scale
@@ -125,12 +112,99 @@ scoreboard players operation #knockback_distance_root knockback_scale += #knockb
 scoreboard players operation #knockback_distance_root knockback_scale /= #scale_2 knockback_scale
 
 # ============================================================
-# DEBUG - VECTOR / DISTANCE
+# DEBUG - 3D VECTOR / DISTANCE
 # ============================================================
 
 tellraw @a [{"text":"[KB MATH] DX: ","color":"yellow"},{"score":{"name":"#knockback_dx","objective":"knockback_dx"}},{"text":" DY: ","color":"yellow"},{"score":{"name":"#knockback_dy","objective":"knockback_dy"}},{"text":" DZ: ","color":"yellow"},{"score":{"name":"#knockback_dz","objective":"knockback_dz"}}]
 
 tellraw @a [{"text":"[KB MATH] DIST²: ","color":"aqua"},{"score":{"name":"#knockback_distance","objective":"knockback_distance"}},{"text":" ROOT: ","color":"aqua"},{"score":{"name":"#knockback_distance_root","objective":"knockback_scale"}}]
+
+# ============================================================
+# CALCULATE HORIZONTAL XZ DISTANCE²
+#
+# Only X and Z are used here.
+#
+# This distance is used ONLY to normalize the horizontal
+# knockback direction.
+# ============================================================
+
+scoreboard players operation #knockback_horizontal_distance knockback_distance = #knockback_dx knockback_dx
+scoreboard players operation #knockback_horizontal_distance knockback_distance *= #knockback_dx knockback_dx
+
+scoreboard players operation #knockback_math knockback_math = #knockback_dz knockback_dz
+scoreboard players operation #knockback_math knockback_math *= #knockback_dz knockback_math
+
+scoreboard players operation #knockback_horizontal_distance knockback_distance += #knockback_math knockback_math
+
+# ------------------------------------------------------------
+# CALCULATE HORIZONTAL DISTANCE ROOT
+#
+# horizontal distance² = x1,000,000
+# horizontal distance root = x1,000
+# ------------------------------------------------------------
+
+# ------------------------------------------------------------
+# INITIAL APPROXIMATION
+# ------------------------------------------------------------
+
+scoreboard players operation #knockback_horizontal_root knockback_scale = #knockback_horizontal_distance knockback_distance
+scoreboard players operation #knockback_horizontal_root knockback_scale /= #scale_1000 knockback_scale
+
+# ------------------------------------------------------------
+# ITERATION 1
+# ------------------------------------------------------------
+
+scoreboard players operation #knockback_math knockback_scale = #knockback_horizontal_distance knockback_distance
+scoreboard players operation #knockback_math knockback_scale /= #knockback_horizontal_root knockback_scale
+
+scoreboard players operation #knockback_horizontal_root knockback_scale += #knockback_math knockback_scale
+scoreboard players operation #knockback_horizontal_root knockback_scale /= #scale_2 knockback_scale
+
+# ------------------------------------------------------------
+# ITERATION 2
+# ------------------------------------------------------------
+
+scoreboard players operation #knockback_math knockback_scale = #knockback_horizontal_distance knockback_distance
+scoreboard players operation #knockback_math knockback_scale /= #knockback_horizontal_root knockback_scale
+
+scoreboard players operation #knockback_horizontal_root knockback_scale += #knockback_math knockback_scale
+scoreboard players operation #knockback_horizontal_root knockback_scale /= #scale_2 knockback_scale
+
+# ------------------------------------------------------------
+# ITERATION 3
+# ------------------------------------------------------------
+
+scoreboard players operation #knockback_math knockback_scale = #knockback_horizontal_distance knockback_distance
+scoreboard players operation #knockback_math knockback_scale /= #knockback_horizontal_root knockback_scale
+
+scoreboard players operation #knockback_horizontal_root knockback_scale += #knockback_math knockback_scale
+scoreboard players operation #knockback_horizontal_root knockback_scale /= #scale_2 knockback_scale
+
+# ------------------------------------------------------------
+# ITERATION 4
+# ------------------------------------------------------------
+
+scoreboard players operation #knockback_math knockback_scale = #knockback_horizontal_distance knockback_distance
+scoreboard players operation #knockback_math knockback_scale /= #knockback_horizontal_root knockback_scale
+
+scoreboard players operation #knockback_horizontal_root knockback_scale += #knockback_math knockback_scale
+scoreboard players operation #knockback_horizontal_root knockback_scale /= #scale_2 knockback_scale
+
+# ------------------------------------------------------------
+# ITERATION 5
+# ------------------------------------------------------------
+
+scoreboard players operation #knockback_math knockback_scale = #knockback_horizontal_distance knockback_distance
+scoreboard players operation #knockback_math knockback_scale /= #knockback_horizontal_root knockback_scale
+
+scoreboard players operation #knockback_horizontal_root knockback_scale += #knockback_math knockback_scale
+scoreboard players operation #knockback_horizontal_root knockback_scale /= #scale_2 knockback_scale
+
+# ============================================================
+# DEBUG - HORIZONTAL DISTANCE
+# ============================================================
+
+tellraw @a [{"text":"[KB HORIZONTAL] DIST²: ","color":"aqua"},{"score":{"name":"#knockback_horizontal_distance","objective":"knockback_distance"}},{"text":" ROOT: ","color":"aqua"},{"score":{"name":"#knockback_horizontal_root","objective":"knockback_scale"}}]
 
 # ------------------------------------------------------------
 # SELECT YIELD MULTIPLIER
@@ -148,26 +222,18 @@ execute if score @s warhead_yield matches 3 run scoreboard players set #knockbac
 # ------------------------------------------------------------
 # LOAD BASE KNOCKBACK FROM CONTROLLER
 # ------------------------------------------------------------
-#
-# @s is the AOE target at this point.
-#
-# The target stores the controller ID in aoe_controller_id.
-# We first copy that ID into a temporary global score, then
-# resolve the matching missile_controller marker and retrieve
-# its yield_knockback value.
-# ------------------------------------------------------------
 
-# Copy this target's controller ID
 scoreboard players operation #active_controller controller_id = @s aoe_controller_id
 
-# Resolve the matching missile controller
-execute as @e[type=minecraft:marker,tag=missile_controller] if score @s controller_id = #active_controller controller_id run scoreboard players operation #knockback_magnitude knockback_scale = #active_yield_knockback knockback_scale
+execute as @e[type=minecraft:marker,tag=missile_controller] if score @s controller_id = #active_controller controller_id run scoreboard players operation #base_knockback knockback_scale = #active_yield_knockback knockback_scale
 
 # ------------------------------------------------------------
 # DEBUG - CONTROLLER KNOCKBACK VALUE
 # ------------------------------------------------------------
 
-tellraw @a [{"text":"[Knockback Debug] Controller KB","color":"gold"},{"score":{"name":"#knockback_magnitude","objective":"knockback_scale"},"color":"aqua"}]
+tellraw @a [{"text":"[Knockback Debug] Base KB = ","color":"gold"},{"score":{"name":"#base_knockback","objective":"knockback_scale"},"color":"aqua"}]
+
+scoreboard players operation #knockback_magnitude knockback_scale = #base_knockback knockback_scale
 
 # ------------------------------------------------------------
 # APPLY YIELD MULTIPLIER
@@ -176,15 +242,18 @@ tellraw @a [{"text":"[Knockback Debug] Controller KB","color":"gold"},{"score":{
 scoreboard players operation #knockback_magnitude knockback_scale *= #knockback_multiplier knockback_scale
 scoreboard players operation #knockback_magnitude knockback_scale /= #scale_1000 knockback_scale
 
+tellraw @a [{"text":"[KB MATH] AFTER YIELD = ","color":"gold"},{"score":{"name":"#knockback_magnitude","objective":"knockback_scale"},"color":"aqua"}]
+
 # ------------------------------------------------------------
 # CALCULATE DYNAMIC AOE RADIUS²
 # ------------------------------------------------------------
 
-scoreboard players operation #active_aoe_radius aoe_radius_squared = @s yield_radius
+execute as @e[type=minecraft:marker,tag=missile_controller] if score @s controller_id = #active_controller controller_id run scoreboard players operation #active_aoe_radius aoe_radius_squared = @s yield_radius
 
-scoreboard players operation #active_aoe_radius aoe_radius_squared *= #aoe_scale aoe_radius_squared
-
+scoreboard players operation #active_aoe_radius aoe_radius_squared *= #scale_1000 knockback_scale
 scoreboard players operation #active_aoe_radius aoe_radius_squared *= #active_aoe_radius aoe_radius_squared
+
+tellraw @a [{"text":"[KB RADIUS] yield_radius: ","color":"yellow"},{"score":{"name":"#active_aoe_radius","objective":"aoe_radius_squared"}},{"text":" | AOE scale: ","color":"white"},{"score":{"name":"#aoe_scale","objective":"aoe_radius_squared"}},{"text":" | Active radius²: ","color":"aqua"},{"score":{"name":"#active_aoe_radius","objective":"aoe_radius_squared"}}]
 
 # ------------------------------------------------------------
 # CALCULATE DISTANCE THRESHOLDS
@@ -200,40 +269,42 @@ scoreboard players operation #active_aoe_radius aoe_radius_squared *= #active_ao
 # ------------------------------------------------------------
 
 scoreboard players operation #kb_20 knockback_scale = #active_aoe_radius aoe_radius_squared
+scoreboard players operation #kb_20 knockback_scale /= #scale_1000 knockback_scale
 
 scoreboard players set #knockback_math knockback_scale 40
 scoreboard players operation #kb_20 knockback_scale *= #knockback_math knockback_scale
-scoreboard players operation #kb_20 knockback_scale /= #scale_1000 knockback_scale
 
 # ------------------------------------------------------------
 # 40% RADIUS²
 # ------------------------------------------------------------
 
 scoreboard players operation #kb_40 knockback_scale = #active_aoe_radius aoe_radius_squared
+scoreboard players operation #kb_40 knockback_scale /= #scale_1000 knockback_scale
 
 scoreboard players set #knockback_math knockback_scale 160
 scoreboard players operation #kb_40 knockback_scale *= #knockback_math knockback_scale
-scoreboard players operation #kb_40 knockback_scale /= #scale_1000 knockback_scale
 
 # ------------------------------------------------------------
 # 60% RADIUS²
 # ------------------------------------------------------------
 
 scoreboard players operation #kb_60 knockback_scale = #active_aoe_radius aoe_radius_squared
+scoreboard players operation #kb_60 knockback_scale /= #scale_1000 knockback_scale
 
 scoreboard players set #knockback_math knockback_scale 360
 scoreboard players operation #kb_60 knockback_scale *= #knockback_math knockback_scale
-scoreboard players operation #kb_60 knockback_scale /= #scale_1000 knockback_scale
 
 # ------------------------------------------------------------
 # 80% RADIUS²
 # ------------------------------------------------------------
 
 scoreboard players operation #kb_80 knockback_scale = #active_aoe_radius aoe_radius_squared
+scoreboard players operation #kb_80 knockback_scale /= #scale_1000 knockback_scale
 
 scoreboard players set #knockback_math knockback_scale 640
 scoreboard players operation #kb_80 knockback_scale *= #knockback_math knockback_scale
-scoreboard players operation #kb_80 knockback_scale /= #scale_1000 knockback_scale
+
+tellraw @a [{"text":"[KB THRESHOLDS] R²: ","color":"gold"},{"score":{"name":"#active_aoe_radius","objective":"aoe_radius_squared"}},{"text":" | KB20: ","color":"white"},{"score":{"name":"#kb_20","objective":"knockback_scale"}},{"text":" | KB40: ","color":"white"},{"score":{"name":"#kb_40","objective":"knockback_scale"}},{"text":" | KB60: ","color":"white"},{"score":{"name":"#kb_60","objective":"knockback_scale"}},{"text":" | KB80: ","color":"white"},{"score":{"name":"#kb_80","objective":"knockback_scale"}}]
 
 # ------------------------------------------------------------
 # SELECT DISTANCE FALLOFF
@@ -270,16 +341,15 @@ tellraw @a [{"text":"[KB MATH] MAGNITUDE: ","color":"green"},{"score":{"name":"#
 
 tellraw @a [{"text":"[KB MATH] KB20: ","color":"white"},{"score":{"name":"#kb_20","objective":"knockback_scale"}},{"text":" KB40: ","color":"white"},{"score":{"name":"#kb_40","objective":"knockback_scale"}},{"text":" KB60: ","color":"white"},{"score":{"name":"#kb_60","objective":"knockback_scale"}},{"text":" KB80: ","color":"white"},{"score":{"name":"#kb_80","objective":"knockback_scale"}}]
 
-# ------------------------------------------------------------
-# VECTOR NORMALIZATION
+# ============================================================
+# HORIZONTAL VECTOR NORMALIZATION
 #
-# Each component:
+# X and Z determine horizontal direction.
+# Y is intentionally NOT derived from DY.
 #
-# component / distance
-#
-# Both component and distance are x1000.
-# The resulting ratio is then restored to x1000.
-# ------------------------------------------------------------
+# Both DX/DZ and horizontal root are x1000.
+# The resulting normalized components are restored to x1000.
+# ============================================================
 
 # ------------------------------------------------------------
 # X
@@ -287,15 +357,7 @@ tellraw @a [{"text":"[KB MATH] KB20: ","color":"white"},{"score":{"name":"#kb_20
 
 scoreboard players operation #knockback_vx knockback_scale = #knockback_dx knockback_dx
 scoreboard players operation #knockback_vx knockback_scale *= #scale_1000 knockback_scale
-scoreboard players operation #knockback_vx knockback_scale /= #knockback_distance_root knockback_scale
-
-# ------------------------------------------------------------
-# Y
-# ------------------------------------------------------------
-
-scoreboard players operation #knockback_vy knockback_scale = #knockback_dy knockback_dy
-scoreboard players operation #knockback_vy knockback_scale *= #scale_1000 knockback_scale
-scoreboard players operation #knockback_vy knockback_scale /= #knockback_distance_root knockback_scale
+scoreboard players operation #knockback_vx knockback_scale /= #knockback_horizontal_root knockback_scale
 
 # ------------------------------------------------------------
 # Z
@@ -303,32 +365,49 @@ scoreboard players operation #knockback_vy knockback_scale /= #knockback_distanc
 
 scoreboard players operation #knockback_vz knockback_scale = #knockback_dz knockback_dz
 scoreboard players operation #knockback_vz knockback_scale *= #scale_1000 knockback_scale
-scoreboard players operation #knockback_vz knockback_scale /= #knockback_distance_root knockback_scale
+scoreboard players operation #knockback_vz knockback_scale /= #knockback_horizontal_root knockback_scale
 
 # ------------------------------------------------------------
-# CONVERT NORMALIZED VECTOR TO FINAL VELOCITY
+# Y
+#
+# Do NOT normalize DY.
+# Use the configured upward launch bias directly.
 # ------------------------------------------------------------
 
-scoreboard players operation #knockback_vx knockback_scale *= #knockback_magnitude knockback_scale
-scoreboard players operation #knockback_vx knockback_scale /= #scale_1000 knockback_scale
-
-scoreboard players operation #knockback_vy knockback_scale *= #knockback_magnitude knockback_scale
-scoreboard players operation #knockback_vy knockback_scale /= #scale_1000 knockback_scale
-
-scoreboard players operation #knockback_vz knockback_scale *= #knockback_magnitude knockback_scale
-scoreboard players operation #knockback_vz knockback_scale /= #scale_1000 knockback_scale
+scoreboard players operation #knockback_vy knockback_scale = #knockback_upward_bias knockback_scale
 
 # ============================================================
-# DEBUG - FINAL KNOCKBACK VECTOR
+# DEBUG - NORMALIZED HORIZONTAL VECTOR
 # ============================================================
 
 tellraw @a [{"text":"[KB VECTOR] VX: ","color":"gold"},{"score":{"name":"#knockback_vx","objective":"knockback_scale"}},{"text":" VY: ","color":"gold"},{"score":{"name":"#knockback_vy","objective":"knockback_scale"}},{"text":" VZ: ","color":"gold"},{"score":{"name":"#knockback_vz","objective":"knockback_scale"}}]
 
 # ------------------------------------------------------------
-# APPLY EXPLOSION UPWARD BIAS
+# CONVERT NORMALIZED HORIZONTAL VECTOR TO FINAL VELOCITY
 # ------------------------------------------------------------
 
-scoreboard players operation #knockback_vy knockback_scale += #knockback_upward_bias knockback_scale
+scoreboard players operation #knockback_vx knockback_scale *= #knockback_magnitude knockback_scale
+scoreboard players operation #knockback_vx knockback_scale /= #scale_1000 knockback_scale
+
+scoreboard players operation #knockback_vz knockback_scale *= #knockback_magnitude knockback_scale
+scoreboard players operation #knockback_vz knockback_scale /= #scale_1000 knockback_scale
+
+# ------------------------------------------------------------
+# CONVERT UPWARD BIAS TO FINAL VELOCITY
+#
+# Upward bias is already an x1000 velocity value.
+# Multiply it by the same magnitude/falloff so the launch
+# scales with explosion strength.
+# ------------------------------------------------------------
+
+scoreboard players operation #knockback_vy knockback_scale *= #knockback_magnitude knockback_scale
+scoreboard players operation #knockback_vy knockback_scale /= #scale_1000 knockback_scale
+
+# ============================================================
+# DEBUG - FINAL KNOCKBACK VECTOR
+# ============================================================
+
+tellraw @a [{"text":"[KB FINAL] Target: ","color":"gold"},{"selector":"@s"},{"text":" | VX=","color":"white"},{"score":{"name":"#knockback_vx","objective":"knockback_scale"},"color":"aqua"},{"text":" VY=","color":"white"},{"score":{"name":"#knockback_vy","objective":"knockback_scale"},"color":"aqua"},{"text":" VZ=","color":"white"},{"score":{"name":"#knockback_vz","objective":"knockback_scale"},"color":"aqua"},{"text":" | MAG=","color":"white"},{"score":{"name":"#knockback_magnitude","objective":"knockback_scale"},"color":"green"}]
 
 # ------------------------------------------------------------
 # APPLY KNOCKBACK
@@ -340,4 +419,4 @@ execute store result entity @s Motion[1] double 0.001 run scoreboard players get
 
 execute store result entity @s Motion[2] double 0.001 run scoreboard players get #knockback_vz knockback_scale
 
-tellraw @a [{"text":"[KB DEBUG] ","color":"gold"},{"selector":"@s"},{"text":" | X:"},{"score":{"name":"#debug_kb_x","objective":"debug_damage"}},{"text":" Y:"},{"score":{"name":"#debug_kb_y","objective":"debug_damage"}},{"text":" Z:"},{"score":{"name":"#debug_kb_z","objective":"debug_damage"}}]
+data get entity @s Motion

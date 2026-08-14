@@ -91,7 +91,7 @@ scoreboard objectives add knockback_magnitude dummy
 scoreboard players set #scale_1000 knockback_scale 1000
 
 # Upward explosion bias
-scoreboard players set #knockback_upward_bias knockback_scale 250
+scoreboard players set #knockback_upward_bias knockback_scale 500
 
 # ============================================================
 # WARHEAD SELECTION SYSTEM
@@ -155,6 +155,8 @@ scoreboard players set #config_status missile_config 0
 scoreboard players set #config_warhead missile_config 1
 scoreboard players set #config_yield missile_config 1
 scoreboard players set #config_potion missile_config 1
+scoreboard players set #base_knockback knockback_scale 0
+scoreboard players set #active_aoe_radius aoe_radius_squared 0
 
 scoreboard players set #aoe_scale aoe_radius_squared 1000
 

@@ -18,7 +18,7 @@ execute unless score #config_yield missile_config matches 1..3 run say ERROR: NO
 # VERIFY POTION SUBTYPE
 # ------------------------------------------------------------
 
-execute unless score #config_potion missile_config matches 1..4 run say ERROR: NO POTION SUBTYPE SELECTED
+execute if score #config_warhead missile_config matches 4 unless score #config_potion missile_config matches 1..4 run say ERROR: NO POTION SUBTYPE SELECTED
 
 # ------------------------------------------------------------
 # CALCULATE CONFIGURATION STATUS
