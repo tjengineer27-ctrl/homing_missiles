@@ -161,7 +161,7 @@ execute as @e[type=minecraft:marker,tag=missile_controller,tag=!firework_id_assi
 # COPY SELECTED TARGET ID TO TRACKER
 # ------------------------------------------------------------
 
-execute as @e[type=minecraft:firework_rocket,tag=homing_missile,tag=has_target,tag=!tracker_created] at @s run scoreboard players operation @e[type=minecraft:marker,tag=missile_tracker,distance=..1,sort=nearest,limit=1] tracker_target = @e[type=#missile:valid_targets,distance=..64,sort=nearest,limit=1] target_id
+execute as @e[type=minecraft:firework_rocket,tag=homing_missile,tag=has_target,tag=!tracker_created] at @s run scoreboard players operation @e[type=minecraft:marker,tag=missile_tracker,distance=..1,sort=nearest,limit=1] tracker_target = @e[type=#missile:valid_targets,distance=..128,sort=nearest,limit=1] target_id
 
 
 # ------------------------------------------------------------
