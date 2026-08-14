@@ -9,14 +9,6 @@
 scoreboard players operation #active_controller controller_id = @s controller_id
 
 # ------------------------------------------------------------
-# INITIALIZE CONTROLLER CONFIGURATION
-# ------------------------------------------------------------
-
-scoreboard players operation @s warhead_type = #config_warhead missile_config
-scoreboard players operation @s warhead_yield = #config_yield missile_config
-scoreboard players operation @s potion_type = #config_potion missile_config
-
-# ------------------------------------------------------------
 # LOAD THIS CONTROLLER'S IMPACT TARGET ID
 # ------------------------------------------------------------
 
