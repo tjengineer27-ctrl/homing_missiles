@@ -2,7 +2,7 @@
 # HOMING MISSILE - POTION / STATUS EFFECT WARHEAD
 # ============================================================
 
-say POTION WARHEAD ACTIVATED
+# say POTION WARHEAD ACTIVATED
 
 # ------------------------------------------------------------
 # LOAD THIS CONTROLLER'S PRIMARY TARGET ID

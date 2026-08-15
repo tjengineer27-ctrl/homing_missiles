@@ -2,7 +2,7 @@
 # HOMING MISSILE - FIRE WARHEAD
 # ============================================================
 
-say FIRE WARHEAD ACTIVATED
+# say FIRE WARHEAD ACTIVATED
 
 # ------------------------------------------------------------
 # LOAD THIS CONTROLLER'S PRIMARY TARGET ID

@@ -2,13 +2,13 @@
 # EXPLOSIVE WARHEAD
 # ============================================================
 
-tellraw @a {"text":"[EXPLOSIVE DEBUG] EXPLOSIVE WARHEAD ENTERED","color":"gold"}
+# tellraw @a {"text":"[EXPLOSIVE DEBUG] EXPLOSIVE WARHEAD ENTERED","color":"gold"}
 
 # ------------------------------------------------------------
 # VERIFY YIELD
 # ------------------------------------------------------------
 
-execute if score @s warhead_yield matches 1 run tellraw @a {"text":"[EXPLOSIVE DEBUG] LOW YIELD SELECTED","color":"yellow"}
+# execute if score @s warhead_yield matches 1 run tellraw @a {"text":"[EXPLOSIVE DEBUG] LOW YIELD SELECTED","color":"yellow"}
 
 # ------------------------------------------------------------
 # LOAD THIS CONTROLLER'S PRIMARY TARGET ID

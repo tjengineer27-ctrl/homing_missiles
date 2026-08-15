@@ -14,20 +14,21 @@ execute as @e[type=minecraft:firework_rocket,tag=!homing_missile] at @s run func
 
 execute as @e[type=minecraft:firework_rocket,tag=homing_missile] run function missile:age
 
-# ============================================================
-# CROSSHAIR TARGETING SYSTEM
-# ============================================================
-
-# Temporary designation tag
-# Applied to the single enemy currently under the player's crosshair.
-
-tag @e[type=#missile:valid_targets] remove crosshair_target
-
 # ------------------------------------------------------------
 # TARGET ID ASSIGNMENT
 # ------------------------------------------------------------
 
 execute as @e[type=#missile:valid_targets,tag=!target_id_assigned] run function missile:assign_target_id
+
+# ============================================================
+# CROSSHAIR TARGET DESIGNATION
+# ============================================================
+
+execute as @a at @s run function missile:crosshair_targeting
+
+# ============================================================
+# HOMING MISSILE SYSTEM
+# ============================================================
 
 # ------------------------------------------------------------
 # TARGET ACQUISITION
@@ -53,6 +54,10 @@ function missile:track_target
 
 # function missile:position
 
+# ------------------------------------------------------------
+# VISUAL
+# ------------------------------------------------------------
+
 function missile:visual
 
 # ------------------------------------------------------------
@@ -66,7 +71,6 @@ function missile:movement
 # ------------------------------------------------------------
 
 # function missile:retarget
-function missile:crosshair_targeting
 function missile:guidance
 # function missile:terrain
 # function missile:collision

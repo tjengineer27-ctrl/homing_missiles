@@ -2,7 +2,7 @@
 # HOMING MISSILE - WARHEAD DISPATCHER
 # ============================================================
 
-say WARHEAD DISPATCHER ENTERED
+# say WARHEAD DISPATCHER ENTERED
 
 execute if score @s warhead_type matches 1 run say WARHEAD TYPE = EXPLOSIVE
 execute if score @s warhead_type matches 2 run say WARHEAD TYPE = POTION

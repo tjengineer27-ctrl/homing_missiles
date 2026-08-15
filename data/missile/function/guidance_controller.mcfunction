@@ -47,16 +47,78 @@ execute as @e[type=minecraft:marker,tag=missile_tracker] if score @s tracker_con
 execute as @e[type=#missile:valid_targets] if score @s target_id = #guidance_target target_id run tag @s add guidance_target
 
 # ------------------------------------------------------------
+# RETARGET IF CURRENT TARGET IS LOST
+# ------------------------------------------------------------
+
+execute unless entity @e[type=#missile:valid_targets,tag=guidance_target] if score #guidance_target target_id matches 1.. if entity @s[tag=!missile_impact] run function missile:retarget
+
+# ------------------------------------------------------------
+# RELOAD TARGET ID AFTER RETARGETING
+# ------------------------------------------------------------
+
+execute unless entity @e[type=#missile:valid_targets,tag=guidance_target] run scoreboard players set #guidance_target target_id 0
+
+execute as @e[type=minecraft:marker,tag=missile_tracker] if score @s tracker_controller_id = #active_controller controller_id run scoreboard players operation #guidance_target target_id = @s tracker_target
+
+# ------------------------------------------------------------
+# RESOLVE NEW TARGET
+# ------------------------------------------------------------
+
+execute as @e[type=#missile:valid_targets] if score @s target_id = #guidance_target target_id run tag @s add guidance_target
+
+# ------------------------------------------------------------
 # ASSIGN TEMPORARY MOVEMENT TARGET
 # ------------------------------------------------------------
 
 execute as @e[type=#missile:valid_targets,tag=guidance_target] run tag @s add guidance_move_target
 
 # ------------------------------------------------------------
+# SAVE PREVIOUS VISIBLE MISSILE POSITION
+# ------------------------------------------------------------
+
+execute as @e[type=minecraft:item_display,tag=missile_visual] if score @s visual_controller_id = #active_controller controller_id run scoreboard players operation @s missile_prev_x = @s missile_x
+
+execute as @e[type=minecraft:item_display,tag=missile_visual] if score @s visual_controller_id = #active_controller controller_id run scoreboard players operation @s missile_prev_y = @s missile_y
+
+execute as @e[type=minecraft:item_display,tag=missile_visual] if score @s visual_controller_id = #active_controller controller_id run scoreboard players operation @s missile_prev_z = @s missile_z
+
+# ------------------------------------------------------------
+# LOAD CURRENT VISIBLE MISSILE POSITION
+# ------------------------------------------------------------
+
+execute as @e[type=minecraft:item_display,tag=missile_visual] if score @s visual_controller_id = #active_controller controller_id store result score @s missile_x run data get entity @s Pos[0] 1000
+
+execute as @e[type=minecraft:item_display,tag=missile_visual] if score @s visual_controller_id = #active_controller controller_id store result score @s missile_y run data get entity @s Pos[1] 1000
+
+execute as @e[type=minecraft:item_display,tag=missile_visual] if score @s visual_controller_id = #active_controller controller_id store result score @s missile_z run data get entity @s Pos[2] 1000
+
+# ------------------------------------------------------------
+# CALCULATE VISIBLE MISSILE VELOCITY
+# ------------------------------------------------------------
+
+execute as @e[type=minecraft:item_display,tag=missile_visual] if score @s visual_controller_id = #active_controller controller_id run scoreboard players operation @s missile_vx = @s missile_x
+
+execute as @e[type=minecraft:item_display,tag=missile_visual] if score @s visual_controller_id = #active_controller controller_id run scoreboard players operation @s missile_vx -= @s missile_prev_x
+
+execute as @e[type=minecraft:item_display,tag=missile_visual] if score @s visual_controller_id = #active_controller controller_id run scoreboard players operation @s missile_vy = @s missile_y
+
+execute as @e[type=minecraft:item_display,tag=missile_visual] if score @s visual_controller_id = #active_controller controller_id run scoreboard players operation @s missile_vy -= @s missile_prev_y
+
+execute as @e[type=minecraft:item_display,tag=missile_visual] if score @s visual_controller_id = #active_controller controller_id run scoreboard players operation @s missile_vz = @s missile_z
+
+execute as @e[type=minecraft:item_display,tag=missile_visual] if score @s visual_controller_id = #active_controller controller_id run scoreboard players operation @s missile_vz -= @s missile_prev_z
+
+# ------------------------------------------------------------
 # PROCESS THIS CONTROLLER'S VECTOR
 # ------------------------------------------------------------
 
 function missile:guidance_vector
+
+# ------------------------------------------------------------
+# PROCESS PROPORTIONAL NAVIGATION
+# ------------------------------------------------------------
+
+function missile:proportional_navigation
 
 # ------------------------------------------------------------
 # CALCULATE THIS MISSILE'S YIELD VALUES

@@ -3,6 +3,14 @@
 # ============================================================
 
 # ------------------------------------------------------------
+# SAVE PREVIOUS GUIDANCE VECTOR
+# ------------------------------------------------------------
+
+scoreboard players operation @s guidance_prev_dx = @s guidance_dx
+scoreboard players operation @s guidance_prev_dy = @s guidance_dy
+scoreboard players operation @s guidance_prev_dz = @s guidance_dz
+
+# ------------------------------------------------------------
 # CONTROLLER POSITION
 # ------------------------------------------------------------
 
@@ -45,6 +53,10 @@ scoreboard players operation #distance_y guidance_dist_y /= #scale_10 guidance_s
 
 scoreboard players operation #distance_z guidance_dist_z = @s guidance_dz
 scoreboard players operation #distance_z guidance_dist_z /= #scale_10 guidance_scale
+
+scoreboard players operation @s pn_dx = #distance_x guidance_dist_x
+scoreboard players operation @s pn_dy = #distance_y guidance_dist_y
+scoreboard players operation @s pn_dz = #distance_z guidance_dist_z
 
 # ------------------------------------------------------------
 # SQUARE EACH COMPONENT

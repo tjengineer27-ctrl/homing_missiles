@@ -2,7 +2,7 @@
 # HOMING MISSILE - TELEPORTATION WARHEAD
 # ============================================================
 
-say TELEPORTATION WARHEAD ACTIVATED
+# say TELEPORTATION WARHEAD ACTIVATED
 
 # ------------------------------------------------------------
 # LOAD THIS CONTROLLER'S PRIMARY TARGET ID

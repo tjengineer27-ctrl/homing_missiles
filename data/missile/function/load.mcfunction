@@ -39,9 +39,53 @@ scoreboard objectives add missile_x dummy
 scoreboard objectives add missile_y dummy
 scoreboard objectives add missile_z dummy
 
+scoreboard objectives add missile_prev_x dummy
+scoreboard objectives add missile_prev_y dummy
+scoreboard objectives add missile_prev_z dummy
+
+scoreboard objectives add missile_vx dummy
+scoreboard objectives add missile_vy dummy
+scoreboard objectives add missile_vz dummy
+
 scoreboard objectives add guidance_dx dummy
 scoreboard objectives add guidance_dy dummy
 scoreboard objectives add guidance_dz dummy
+
+scoreboard objectives add guidance_prev_dx dummy
+scoreboard objectives add guidance_prev_dy dummy
+scoreboard objectives add guidance_prev_dz dummy
+
+scoreboard objectives add guidance_rel_vx dummy
+scoreboard objectives add guidance_rel_vy dummy
+scoreboard objectives add guidance_rel_vz dummy
+
+scoreboard objectives add pn_los_x dummy
+scoreboard objectives add pn_los_y dummy
+scoreboard objectives add pn_los_z dummy
+
+scoreboard objectives add pn_accel_x dummy
+scoreboard objectives add pn_accel_y dummy
+scoreboard objectives add pn_accel_z dummy
+
+scoreboard objectives add pn_scale dummy
+
+scoreboard players set #pn_navigation_gain pn_scale 4000
+scoreboard players set #pn_rate_scale pn_scale 1000
+scoreboard objectives add pn_speed_scale dummy
+scoreboard objectives add pn_dir_x dummy
+scoreboard objectives add pn_dir_y dummy
+scoreboard objectives add pn_dir_z dummy
+
+scoreboard players set #negative_one pn_scale -1
+scoreboard players set #pn_direction_scale pn_scale 1000
+scoreboard players set #pn_math pn_scale 0
+
+scoreboard objectives add pn_dx dummy
+scoreboard objectives add pn_dy dummy
+scoreboard objectives add pn_dz dummy
+
+scoreboard objectives add pn_range_sq dummy
+scoreboard objectives add pn_closing_speed dummy
 
 scoreboard objectives add guidance_cx dummy
 scoreboard objectives add guidance_cy dummy
@@ -99,6 +143,19 @@ scoreboard players set #knockback_upward_bias knockback_scale 500
 
 scoreboard objectives add warhead_type dummy
 scoreboard objectives add potion_type dummy
+
+# ============================================================
+# CROSSHAIR TARGETING SYSTEM
+# ============================================================
+
+scoreboard objectives add crosshair_target_id dummy
+
+# ============================================================
+# CROSSHAIR TARGETING SYSTEM
+# ============================================================
+
+team add missile_red_target
+team modify missile_red_target color red
 
 # ============================================================
 # WARHEAD YIELD SYSTEM
@@ -163,12 +220,6 @@ scoreboard players set #aoe_scale aoe_radius_squared 1000
 scoreboard objectives add debug_damage dummy
 
 scoreboard players set #scale_2 knockback_scale 2
-
-# ============================================================
-# CROSSHAIR TARGETING SYSTEM
-# ============================================================
-
-scoreboard objectives add crosshair_target_id dummy
 
 # Global controller counter
 

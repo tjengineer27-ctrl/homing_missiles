@@ -6,7 +6,7 @@
 # FIND VALID TARGET
 # ============================================================
 
-execute as @e[type=minecraft:firework_rocket,tag=homing_missile,tag=needs_target] at @s if entity @e[type=#missile:valid_targets,distance=..128,sort=nearest,limit=1] run tag @s add has_target
+execute as @e[type=minecraft:firework_rocket,tag=homing_missile,tag=needs_target] if entity @e[type=#missile:valid_targets,tag=crosshair_target,limit=1] run tag @s add has_target
 
 
 # ============================================================
@@ -28,6 +28,24 @@ execute as @e[type=minecraft:marker,tag=missile_controller,tag=!controller_id_as
 execute as @e[type=minecraft:marker,tag=missile_controller,tag=!controller_id_assigned] run scoreboard players operation @s controller_id = #next_controller_id controller_id
 
 execute as @e[type=minecraft:marker,tag=missile_controller,tag=!controller_id_assigned] run tag @s add controller_id_assigned
+
+# ------------------------------------------------------------
+# INITIALIZE MISSILE POSITION HISTORY
+# ------------------------------------------------------------
+
+execute as @e[type=minecraft:marker,tag=missile_controller,tag=controller_id_assigned,tag=!position_initialized] store result score @s missile_x run data get entity @s Pos[0] 1000
+
+execute as @e[type=minecraft:marker,tag=missile_controller,tag=controller_id_assigned,tag=!position_initialized] store result score @s missile_y run data get entity @s Pos[1] 1000
+
+execute as @e[type=minecraft:marker,tag=missile_controller,tag=controller_id_assigned,tag=!position_initialized] store result score @s missile_z run data get entity @s Pos[2] 1000
+
+execute as @e[type=minecraft:marker,tag=missile_controller,tag=controller_id_assigned,tag=!position_initialized] run scoreboard players operation @s missile_prev_x = @s missile_x
+
+execute as @e[type=minecraft:marker,tag=missile_controller,tag=controller_id_assigned,tag=!position_initialized] run scoreboard players operation @s missile_prev_y = @s missile_y
+
+execute as @e[type=minecraft:marker,tag=missile_controller,tag=controller_id_assigned,tag=!position_initialized] run scoreboard players operation @s missile_prev_z = @s missile_z
+
+execute as @e[type=minecraft:marker,tag=missile_controller,tag=controller_id_assigned,tag=!position_initialized] run tag @s add position_initialized
 
 
 # ============================================================
@@ -161,7 +179,7 @@ execute as @e[type=minecraft:marker,tag=missile_controller,tag=!firework_id_assi
 # COPY SELECTED TARGET ID TO TRACKER
 # ------------------------------------------------------------
 
-execute as @e[type=minecraft:firework_rocket,tag=homing_missile,tag=has_target,tag=!tracker_created] at @s run scoreboard players operation @e[type=minecraft:marker,tag=missile_tracker,distance=..1,sort=nearest,limit=1] tracker_target = @e[type=#missile:valid_targets,distance=..128,sort=nearest,limit=1] target_id
+execute as @e[type=minecraft:firework_rocket,tag=homing_missile,tag=has_target,tag=!tracker_created] at @s run scoreboard players operation @e[type=minecraft:marker,tag=missile_tracker,distance=..1,sort=nearest,limit=1] tracker_target = @e[type=#missile:valid_targets,tag=crosshair_target,limit=1] target_id
 
 
 # ------------------------------------------------------------

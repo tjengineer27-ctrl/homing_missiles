@@ -2,7 +2,7 @@
 # HOMING MISSILE - KNOCKBACK TARGET
 # ============================================================
 
-say KNOCKBACK_TARGET FUNCTION ENTERED
+# say KNOCKBACK_TARGET FUNCTION ENTERED
 
 # ------------------------------------------------------------
 # STORE THIS TARGET'S POSITION
@@ -115,9 +115,9 @@ scoreboard players operation #knockback_distance_root knockback_scale /= #scale_
 # DEBUG - 3D VECTOR / DISTANCE
 # ============================================================
 
-tellraw @a [{"text":"[KB MATH] DX: ","color":"yellow"},{"score":{"name":"#knockback_dx","objective":"knockback_dx"}},{"text":" DY: ","color":"yellow"},{"score":{"name":"#knockback_dy","objective":"knockback_dy"}},{"text":" DZ: ","color":"yellow"},{"score":{"name":"#knockback_dz","objective":"knockback_dz"}}]
+# tellraw @a [{"text":"[KB MATH] DX: ","color":"yellow"},{"score":{"name":"#knockback_dx","objective":"knockback_dx"}},{"text":" DY: ","color":"yellow"},{"score":{"name":"#knockback_dy","objective":"knockback_dy"}},{"text":" DZ: ","color":"yellow"},{"score":{"name":"#knockback_dz","objective":"knockback_dz"}}]
 
-tellraw @a [{"text":"[KB MATH] DIST²: ","color":"aqua"},{"score":{"name":"#knockback_distance","objective":"knockback_distance"}},{"text":" ROOT: ","color":"aqua"},{"score":{"name":"#knockback_distance_root","objective":"knockback_scale"}}]
+# tellraw @a [{"text":"[KB MATH] DIST²: ","color":"aqua"},{"score":{"name":"#knockback_distance","objective":"knockback_distance"}},{"text":" ROOT: ","color":"aqua"},{"score":{"name":"#knockback_distance_root","objective":"knockback_scale"}}]
 
 # ============================================================
 # CALCULATE HORIZONTAL XZ DISTANCE²
@@ -204,7 +204,7 @@ scoreboard players operation #knockback_horizontal_root knockback_scale /= #scal
 # DEBUG - HORIZONTAL DISTANCE
 # ============================================================
 
-tellraw @a [{"text":"[KB HORIZONTAL] DIST²: ","color":"aqua"},{"score":{"name":"#knockback_horizontal_distance","objective":"knockback_distance"}},{"text":" ROOT: ","color":"aqua"},{"score":{"name":"#knockback_horizontal_root","objective":"knockback_scale"}}]
+# tellraw @a [{"text":"[KB HORIZONTAL] DIST²: ","color":"aqua"},{"score":{"name":"#knockback_horizontal_distance","objective":"knockback_distance"}},{"text":" ROOT: ","color":"aqua"},{"score":{"name":"#knockback_horizontal_root","objective":"knockback_scale"}}]
 
 # ------------------------------------------------------------
 # SELECT YIELD MULTIPLIER
@@ -231,7 +231,7 @@ execute as @e[type=minecraft:marker,tag=missile_controller] if score @s controll
 # DEBUG - CONTROLLER KNOCKBACK VALUE
 # ------------------------------------------------------------
 
-tellraw @a [{"text":"[Knockback Debug] Base KB = ","color":"gold"},{"score":{"name":"#base_knockback","objective":"knockback_scale"},"color":"aqua"}]
+# tellraw @a [{"text":"[Knockback Debug] Base KB = ","color":"gold"},{"score":{"name":"#base_knockback","objective":"knockback_scale"},"color":"aqua"}]
 
 scoreboard players operation #knockback_magnitude knockback_scale = #base_knockback knockback_scale
 
@@ -242,7 +242,7 @@ scoreboard players operation #knockback_magnitude knockback_scale = #base_knockb
 scoreboard players operation #knockback_magnitude knockback_scale *= #knockback_multiplier knockback_scale
 scoreboard players operation #knockback_magnitude knockback_scale /= #scale_1000 knockback_scale
 
-tellraw @a [{"text":"[KB MATH] AFTER YIELD = ","color":"gold"},{"score":{"name":"#knockback_magnitude","objective":"knockback_scale"},"color":"aqua"}]
+# tellraw @a [{"text":"[KB MATH] AFTER YIELD = ","color":"gold"},{"score":{"name":"#knockback_magnitude","objective":"knockback_scale"},"color":"aqua"}]
 
 # ------------------------------------------------------------
 # CALCULATE DYNAMIC AOE RADIUS²
@@ -253,7 +253,7 @@ execute as @e[type=minecraft:marker,tag=missile_controller] if score @s controll
 scoreboard players operation #active_aoe_radius aoe_radius_squared *= #scale_1000 knockback_scale
 scoreboard players operation #active_aoe_radius aoe_radius_squared *= #active_aoe_radius aoe_radius_squared
 
-tellraw @a [{"text":"[KB RADIUS] yield_radius: ","color":"yellow"},{"score":{"name":"#active_aoe_radius","objective":"aoe_radius_squared"}},{"text":" | AOE scale: ","color":"white"},{"score":{"name":"#aoe_scale","objective":"aoe_radius_squared"}},{"text":" | Active radius²: ","color":"aqua"},{"score":{"name":"#active_aoe_radius","objective":"aoe_radius_squared"}}]
+# tellraw @a [{"text":"[KB RADIUS] yield_radius: ","color":"yellow"},{"score":{"name":"#active_aoe_radius","objective":"aoe_radius_squared"}},{"text":" | AOE scale: ","color":"white"},{"score":{"name":"#aoe_scale","objective":"aoe_radius_squared"}},{"text":" | Active radius²: ","color":"aqua"},{"score":{"name":"#active_aoe_radius","objective":"aoe_radius_squared"}}]
 
 # ------------------------------------------------------------
 # CALCULATE DISTANCE THRESHOLDS
@@ -304,7 +304,7 @@ scoreboard players operation #kb_80 knockback_scale /= #scale_1000 knockback_sca
 scoreboard players set #knockback_math knockback_scale 640
 scoreboard players operation #kb_80 knockback_scale *= #knockback_math knockback_scale
 
-tellraw @a [{"text":"[KB THRESHOLDS] R²: ","color":"gold"},{"score":{"name":"#active_aoe_radius","objective":"aoe_radius_squared"}},{"text":" | KB20: ","color":"white"},{"score":{"name":"#kb_20","objective":"knockback_scale"}},{"text":" | KB40: ","color":"white"},{"score":{"name":"#kb_40","objective":"knockback_scale"}},{"text":" | KB60: ","color":"white"},{"score":{"name":"#kb_60","objective":"knockback_scale"}},{"text":" | KB80: ","color":"white"},{"score":{"name":"#kb_80","objective":"knockback_scale"}}]
+# tellraw @a [{"text":"[KB THRESHOLDS] R²: ","color":"gold"},{"score":{"name":"#active_aoe_radius","objective":"aoe_radius_squared"}},{"text":" | KB20: ","color":"white"},{"score":{"name":"#kb_20","objective":"knockback_scale"}},{"text":" | KB40: ","color":"white"},{"score":{"name":"#kb_40","objective":"knockback_scale"}},{"text":" | KB60: ","color":"white"},{"score":{"name":"#kb_60","objective":"knockback_scale"}},{"text":" | KB80: ","color":"white"},{"score":{"name":"#kb_80","objective":"knockback_scale"}}]
 
 # ------------------------------------------------------------
 # SELECT DISTANCE FALLOFF
@@ -337,9 +337,9 @@ scoreboard players operation #knockback_magnitude knockback_scale /= #scale_1000
 # DEBUG - FALLOFF RESULT
 # ============================================================
 
-tellraw @a [{"text":"[KB MATH] MAGNITUDE: ","color":"green"},{"score":{"name":"#knockback_magnitude","objective":"knockback_scale"}},{"text":" FALLOFF: ","color":"green"},{"score":{"name":"#knockback_falloff","objective":"knockback_scale"}}]
+# tellraw @a [{"text":"[KB MATH] MAGNITUDE: ","color":"green"},{"score":{"name":"#knockback_magnitude","objective":"knockback_scale"}},{"text":" FALLOFF: ","color":"green"},{"score":{"name":"#knockback_falloff","objective":"knockback_scale"}}]
 
-tellraw @a [{"text":"[KB MATH] KB20: ","color":"white"},{"score":{"name":"#kb_20","objective":"knockback_scale"}},{"text":" KB40: ","color":"white"},{"score":{"name":"#kb_40","objective":"knockback_scale"}},{"text":" KB60: ","color":"white"},{"score":{"name":"#kb_60","objective":"knockback_scale"}},{"text":" KB80: ","color":"white"},{"score":{"name":"#kb_80","objective":"knockback_scale"}}]
+# tellraw @a [{"text":"[KB MATH] KB20: ","color":"white"},{"score":{"name":"#kb_20","objective":"knockback_scale"}},{"text":" KB40: ","color":"white"},{"score":{"name":"#kb_40","objective":"knockback_scale"}},{"text":" KB60: ","color":"white"},{"score":{"name":"#kb_60","objective":"knockback_scale"}},{"text":" KB80: ","color":"white"},{"score":{"name":"#kb_80","objective":"knockback_scale"}}]
 
 # ============================================================
 # HORIZONTAL VECTOR NORMALIZATION
@@ -380,7 +380,7 @@ scoreboard players operation #knockback_vy knockback_scale = #knockback_upward_b
 # DEBUG - NORMALIZED HORIZONTAL VECTOR
 # ============================================================
 
-tellraw @a [{"text":"[KB VECTOR] VX: ","color":"gold"},{"score":{"name":"#knockback_vx","objective":"knockback_scale"}},{"text":" VY: ","color":"gold"},{"score":{"name":"#knockback_vy","objective":"knockback_scale"}},{"text":" VZ: ","color":"gold"},{"score":{"name":"#knockback_vz","objective":"knockback_scale"}}]
+# tellraw @a [{"text":"[KB VECTOR] VX: ","color":"gold"},{"score":{"name":"#knockback_vx","objective":"knockback_scale"}},{"text":" VY: ","color":"gold"},{"score":{"name":"#knockback_vy","objective":"knockback_scale"}},{"text":" VZ: ","color":"gold"},{"score":{"name":"#knockback_vz","objective":"knockback_scale"}}]
 
 # ------------------------------------------------------------
 # CONVERT NORMALIZED HORIZONTAL VECTOR TO FINAL VELOCITY
@@ -407,7 +407,7 @@ scoreboard players operation #knockback_vy knockback_scale /= #scale_1000 knockb
 # DEBUG - FINAL KNOCKBACK VECTOR
 # ============================================================
 
-tellraw @a [{"text":"[KB FINAL] Target: ","color":"gold"},{"selector":"@s"},{"text":" | VX=","color":"white"},{"score":{"name":"#knockback_vx","objective":"knockback_scale"},"color":"aqua"},{"text":" VY=","color":"white"},{"score":{"name":"#knockback_vy","objective":"knockback_scale"},"color":"aqua"},{"text":" VZ=","color":"white"},{"score":{"name":"#knockback_vz","objective":"knockback_scale"},"color":"aqua"},{"text":" | MAG=","color":"white"},{"score":{"name":"#knockback_magnitude","objective":"knockback_scale"},"color":"green"}]
+# tellraw @a [{"text":"[KB FINAL] Target: ","color":"gold"},{"selector":"@s"},{"text":" | VX=","color":"white"},{"score":{"name":"#knockback_vx","objective":"knockback_scale"},"color":"aqua"},{"text":" VY=","color":"white"},{"score":{"name":"#knockback_vy","objective":"knockback_scale"},"color":"aqua"},{"text":" VZ=","color":"white"},{"score":{"name":"#knockback_vz","objective":"knockback_scale"},"color":"aqua"},{"text":" | MAG=","color":"white"},{"score":{"name":"#knockback_magnitude","objective":"knockback_scale"},"color":"green"}]
 
 # ------------------------------------------------------------
 # APPLY KNOCKBACK
