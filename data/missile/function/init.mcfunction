@@ -14,6 +14,7 @@ tag @s add homing_missile
 
 scoreboard players set @s missile_age 0
 scoreboard players set @s missile_mode 0
+scoreboard players set @s missile_speed 250
 
 # ------------------------------------------------------------
 # UNLIMITED FLIGHT TIME

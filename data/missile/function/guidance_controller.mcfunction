@@ -8,6 +8,22 @@
 
 scoreboard players operation #active_controller controller_id = @s controller_id
 
+# scoreboard players set @s pn_speed_scale 1
+
+# ============================================================
+# INITIAL PN MOVEMENT STATE
+# ============================================================
+
+scoreboard players set @s missile_vx 250
+scoreboard players set @s missile_vy 0
+scoreboard players set @s missile_vz 0
+
+scoreboard players set @s pn_speed_scale 250
+
+scoreboard players set @s pn_dir_x 1000
+scoreboard players set @s pn_dir_y 0
+scoreboard players set @s pn_dir_z 0
+
 # ------------------------------------------------------------
 # LOAD THIS CONTROLLER'S IMPACT TARGET ID
 # ------------------------------------------------------------
@@ -107,6 +123,20 @@ execute as @e[type=minecraft:item_display,tag=missile_visual] if score @s visual
 execute as @e[type=minecraft:item_display,tag=missile_visual] if score @s visual_controller_id = #active_controller controller_id run scoreboard players operation @s missile_vz = @s missile_z
 
 execute as @e[type=minecraft:item_display,tag=missile_visual] if score @s visual_controller_id = #active_controller controller_id run scoreboard players operation @s missile_vz -= @s missile_prev_z
+
+# ------------------------------------------------------------
+# COPY VISIBLE MISSILE VELOCITY TO CONTROLLER
+# ------------------------------------------------------------
+
+execute as @e[type=minecraft:item_display,tag=missile_visual] if score @s visual_controller_id = #active_controller controller_id run scoreboard players operation #active_missile_vx missile_vx = @s missile_vx
+
+execute as @e[type=minecraft:item_display,tag=missile_visual] if score @s visual_controller_id = #active_controller controller_id run scoreboard players operation #active_missile_vy missile_vy = @s missile_vy
+
+execute as @e[type=minecraft:item_display,tag=missile_visual] if score @s visual_controller_id = #active_controller controller_id run scoreboard players operation #active_missile_vz missile_vz = @s missile_vz
+
+scoreboard players operation @s missile_vx = #active_missile_vx missile_vx
+scoreboard players operation @s missile_vy = #active_missile_vy missile_vy
+scoreboard players operation @s missile_vz = #active_missile_vz missile_vz
 
 # ------------------------------------------------------------
 # PROCESS THIS CONTROLLER'S VECTOR
