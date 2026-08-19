@@ -80,8 +80,13 @@ scoreboard objectives add pn_accel_z dummy
 
 scoreboard objectives add pn_scale dummy
 
+scoreboard objectives add pn_closing_speed dummy
+
+scoreboard players set #pn_closing_scale pn_scale 100
+
 scoreboard players set #pn_navigation_gain pn_scale 4000
 scoreboard players set #pn_rate_scale pn_scale 1000
+scoreboard players set #pn_output_scale pn_scale 1000000
 
 scoreboard objectives add pn_speed_scale dummy
 
@@ -101,7 +106,7 @@ scoreboard players set #pn_math pn_scale 1
 # 50    = stronger
 # 25    = very strong
 
-scoreboard players set #pn_turn_scale pn_scale 100
+scoreboard players set #pn_turn_scale pn_scale 5000
 
 
 # ============================================================
@@ -271,6 +276,9 @@ scoreboard players set #active_aoe_radius aoe_radius_squared 0
 
 scoreboard players set #aoe_scale aoe_radius_squared 1000
 
+scoreboard players set #initial_vx missile_vx 0
+scoreboard players set #initial_vy missile_vy 0
+scoreboard players set #initial_vz missile_vz 0
 
 # ============================================================
 # DEBUG
