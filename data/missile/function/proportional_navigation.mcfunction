@@ -2,46 +2,28 @@
 # HOMING MISSILE - PROPORTIONAL NAVIGATION
 # ============================================================
 #
-# Calculates an LOS angular-rate-based PN correction.
+# Calculates proportional-navigation guidance with a pursuit
+# fallback.
 #
-# Conceptually:
+# Normal PN:
 #
-#   a_PN ∝ N × ClosingSpeed × (omega × Vhat)
+#   a_PN ∝ N × Vclose × (omega × Vhat)
 #
 # where:
 #
 #   omega = (R × Vrel) / |R|²
 #
-# and:
+# The missile also receives a pursuit correction when closing
+# velocity is low or negative.
 #
-#   ClosingSpeed = -(R · Vmissile) / |R|
-#
-# IMPORTANT:
-#
-# Closing speed is calculated from the missile's ACTUAL
-# velocity, not from the tick-to-tick change in the guidance
-# vector.
-#
-# Scoreboard scaling:
-#
-#   R       ≈ 100x
-#   V       ≈ 1000x
-#   Vhat    ≈ 1000x
-#   omega   ≈ 1000x
-#   closing ≈ 1000x
+# This prevents PN from completely shutting off when the
+# missile is temporarily opening from a moving target.
 #
 # ============================================================
 
 
 # ============================================================
 # RELATIVE TARGET MOVEMENT
-# ============================================================
-#
-# ΔR = R(current) - R(previous)
-#
-# This is used to estimate relative target movement for
-# the LOS angular-rate calculation.
-#
 # ============================================================
 
 scoreboard players operation @s guidance_rel_vx = @s guidance_dx
@@ -67,16 +49,19 @@ scoreboard players set @s pn_accel_y 0
 scoreboard players set @s pn_accel_z 0
 
 scoreboard players set @s pn_closing_speed 0
+scoreboard players set @s pn_effective_closing 0
 
-scoreboard players set @s pn_range_sq 0
+scoreboard players set @s pn_los_dir_x 0
+scoreboard players set @s pn_los_dir_y 0
+scoreboard players set @s pn_los_dir_z 0
+
+scoreboard players set @s pn_pursuit_x 0
+scoreboard players set @s pn_pursuit_y 0
+scoreboard players set @s pn_pursuit_z 0
 
 
 # ============================================================
 # CALCULATE LOS RANGE SQUARED
-# ============================================================
-#
-# |R|² = Rx² + Ry² + Rz²
-#
 # ============================================================
 
 scoreboard players operation @s pn_range_sq = @s pn_dx
@@ -95,13 +80,9 @@ scoreboard players operation @s pn_range_sq += #pn_math pn_scale
 # CALCULATE APPROXIMATE LOS RANGE
 # ============================================================
 #
-# No square-root operation exists for scoreboards.
+# |R| ≈ max(|Rx|, |Ry|, |Rz|)
 #
-# Approximation:
-#
-#   |R| ≈ max(|Rx|, |Ry|, |Rz|)
-#
-# pn_dx/dy/dz are approximately 100x block precision.
+# pn_dx / pn_dy / pn_dz use approximately 100x block scale.
 #
 # ============================================================
 
@@ -142,117 +123,101 @@ execute if score #pn_math pn_component > #pn_math pn_range run scoreboard player
 
 
 # ============================================================
-# CALCULATE CLOSING SPEED
+# NORMALIZE LOS DIRECTION
 # ============================================================
+#
+# LOS direction:
+#
+#   Rhat ≈ R / max(|R|)
+#
+# Result is scaled to 1000.
+#
+# ============================================================
+
+execute if score #pn_math pn_range matches 1.. run scoreboard players operation @s pn_los_dir_x = @s pn_dx
+execute if score #pn_math pn_range matches 1.. run scoreboard players operation @s pn_los_dir_x *= #pn_direction_scale pn_scale
+execute if score #pn_math pn_range matches 1.. run scoreboard players operation @s pn_los_dir_x /= #pn_math pn_range
+
+execute if score #pn_math pn_range matches 1.. run scoreboard players operation @s pn_los_dir_y = @s pn_dy
+execute if score #pn_math pn_range matches 1.. run scoreboard players operation @s pn_los_dir_y *= #pn_direction_scale pn_scale
+execute if score #pn_math pn_range matches 1.. run scoreboard players operation @s pn_los_dir_y /= #pn_math pn_range
+
+execute if score #pn_math pn_range matches 1.. run scoreboard players operation @s pn_los_dir_z = @s pn_dz
+execute if score #pn_math pn_range matches 1.. run scoreboard players operation @s pn_los_dir_z *= #pn_direction_scale pn_scale
+execute if score #pn_math pn_range matches 1.. run scoreboard players operation @s pn_los_dir_z /= #pn_math pn_range
+
+
+# ============================================================
+# CALCULATE SIGNED CLOSING SPEED
+# ============================================================
+#
+# Vclose = -(R · ΔR) / |R|
 #
 # IMPORTANT:
+# We deliberately DO NOT clamp negative values here.
 #
-# Use the missile's ACTUAL velocity:
+# pn_closing_speed is now a signed diagnostic:
 #
-#   Vc = -(R · V) / |R|
-#
-# NOT:
-#
-#   -(R · ΔR) / |R|
-#
-# ΔR is still used for LOS angular rate, but it is not a
-# reliable representation of the missile's actual velocity
-# because guidance values are integer-truncated.
-#
-# Scaling:
-#
-#   R = 100x
-#   V = 1000x
-#
-# Therefore:
-#
-#   R · V = 100,000x
-#
-# Dividing by R (100x):
-#
-#   Vc = 1000x
-#
-# So a missile travelling at approximately:
-#
-#   0.25 blocks/tick
-#
-# toward the target should produce approximately:
-#
-#   CLOSING = 250
+#   positive = closing
+#   zero     = perpendicular
+#   negative = opening
 #
 # ============================================================
 
-
-# ------------------------------------------------------------
-# CLEAR CLOSING SPEED
-# ------------------------------------------------------------
-
-scoreboard players set @s pn_closing_speed 0
-
-
-# ------------------------------------------------------------
-# X COMPONENT
-# ------------------------------------------------------------
-
 scoreboard players operation @s pn_closing_speed = @s pn_dx
-scoreboard players operation @s pn_closing_speed *= @s missile_vx
-
-
-# ------------------------------------------------------------
-# Y COMPONENT
-# ------------------------------------------------------------
+scoreboard players operation @s pn_closing_speed *= @s guidance_rel_vx
 
 scoreboard players operation #pn_math pn_component = @s pn_dy
-scoreboard players operation #pn_math pn_component *= @s missile_vy
-
+scoreboard players operation #pn_math pn_component *= @s guidance_rel_vy
 scoreboard players operation @s pn_closing_speed += #pn_math pn_component
-
-
-# ------------------------------------------------------------
-# Z COMPONENT
-# ------------------------------------------------------------
 
 scoreboard players operation #pn_math pn_component = @s pn_dz
-scoreboard players operation #pn_math pn_component *= @s missile_vz
-
+scoreboard players operation #pn_math pn_component *= @s guidance_rel_vz
 scoreboard players operation @s pn_closing_speed += #pn_math pn_component
 
-
-# ------------------------------------------------------------
-# DIVIDE BY APPROXIMATE RANGE
-# ------------------------------------------------------------
+scoreboard players operation @s pn_closing_speed *= #negative_one pn_scale
 
 execute if score #pn_math pn_range matches 1.. run scoreboard players operation @s pn_closing_speed /= #pn_math pn_range
 
 
-# ------------------------------------------------------------
-# INVERT SIGN
-# ------------------------------------------------------------
+# ============================================================
+# EFFECTIVE CLOSING SPEED
+# ============================================================
 #
-# Positive = closing
-# Negative = opening
+# PN needs a positive magnitude to remain responsive.
 #
-# ------------------------------------------------------------
+# If actual closing speed is positive:
+#
+#   effective = actual closing speed
+#
+# If actual closing speed is zero or negative:
+#
+#   effective = minimum guidance speed
+#
+# This prevents:
+#
+#   CLOSING = 0
+#       ↓
+#   PN ACCEL = 0
+#
+# from permanently disabling guidance.
+#
+# ============================================================
 
-scoreboard players operation @s pn_closing_speed *= #negative_one pn_scale
+scoreboard players operation @s pn_effective_closing = @s pn_closing_speed
 
-
-# ------------------------------------------------------------
-# DO NOT ALLOW NEGATIVE CLOSING SPEED
-# ------------------------------------------------------------
-
-execute if score @s pn_closing_speed matches ..-1 run scoreboard players set @s pn_closing_speed 0
+execute if score @s pn_effective_closing matches ..99 run scoreboard players operation @s pn_effective_closing = #pn_min_closing pn_scale
 
 
 # ============================================================
 # CALCULATE R × ΔR
 # ============================================================
 #
-# This is used for LOS angular rate.
+# omega numerator:
 #
-# X = Ry*ΔRz - Rz*ΔRy
-# Y = Rz*ΔRx - Rx*ΔRz
-# Z = Rx*ΔRy - Ry*ΔRx
+#   X = Ry*ΔRz - Rz*ΔRy
+#   Y = Rz*ΔRx - Rx*ΔRz
+#   Z = Rx*ΔRy - Ry*ΔRx
 #
 # ============================================================
 
@@ -299,16 +264,6 @@ scoreboard players operation @s pn_los_z -= #pn_math pn_scale
 # ============================================================
 # CONVERT R × ΔR INTO SCALED LOS ANGULAR RATE
 # ============================================================
-#
-# omega = (R × Vrel) / |R|²
-#
-# We approximate Vrel using ΔR.
-#
-# Rate scale:
-#
-#   #pn_rate_scale = 1000
-#
-# ============================================================
 
 execute if score @s pn_range_sq matches 1.. run scoreboard players operation @s pn_los_x *= #pn_rate_scale pn_scale
 execute if score @s pn_range_sq matches 1.. run scoreboard players operation @s pn_los_y *= #pn_rate_scale pn_scale
@@ -323,9 +278,7 @@ execute if score @s pn_range_sq matches 1.. run scoreboard players operation @s 
 # NORMALIZE MISSILE VELOCITY
 # ============================================================
 #
-# Approximation:
-#
-#   Vhat ≈ V / max(|Vx|, |Vy|, |Vz|)
+# Vhat ≈ V / max(|Vx|, |Vy|, |Vz|)
 #
 # ============================================================
 
@@ -368,26 +321,22 @@ execute if score #pn_math pn_scale > @s pn_speed_scale run scoreboard players op
 # ============================================================
 # LIMIT MISSILE SPEED
 # ============================================================
-#
-# 250 / 1000 = 0.25 blocks/tick
-#
-# ============================================================
 
 execute if score @s pn_speed_scale matches 251.. run scoreboard players set @s pn_speed_scale 250
 
 
-# ------------------------------------------------------------
+# ============================================================
 # CLEAR NORMALIZED DIRECTION
-# ------------------------------------------------------------
+# ============================================================
 
 scoreboard players set @s pn_dir_x 0
 scoreboard players set @s pn_dir_y 0
 scoreboard players set @s pn_dir_z 0
 
 
-# ------------------------------------------------------------
+# ============================================================
 # NORMALIZE VELOCITY
-# ------------------------------------------------------------
+# ============================================================
 
 execute if score @s pn_speed_scale matches 1.. run scoreboard players operation @s pn_dir_x = @s missile_vx
 execute if score @s pn_speed_scale matches 1.. run scoreboard players operation @s pn_dir_x *= #pn_direction_scale pn_scale
@@ -406,7 +355,7 @@ execute if score @s pn_speed_scale matches 1.. run scoreboard players operation 
 # CALCULATE PN TURNING COMPONENT
 # ============================================================
 #
-#   omega × Vhat
+# omega × Vhat
 #
 # ============================================================
 
@@ -451,60 +400,105 @@ scoreboard players operation @s pn_accel_z -= #pn_math pn_scale
 
 
 # ============================================================
-# APPLY CLOSING SPEED
-# ============================================================
-#
-# At this point:
-#
-#   pn_los ≈ omega × 1000
-#   pn_dir ≈ Vhat × 1000
-#
-# Therefore their cross product is approximately 1,000,000x.
-#
-# Multiplying by closing speed adds another 1000x.
-#
-# We therefore divide by:
-#
-#   1,000,000
-#
-# to return the result to approximately velocity-scale
-# precision before applying the navigation gain.
-#
+# APPLY EFFECTIVE CLOSING SPEED TO PN
 # ============================================================
 
-scoreboard players operation @s pn_accel_x *= @s pn_closing_speed
-scoreboard players operation @s pn_accel_x /= #pn_output_scale pn_scale
+scoreboard players operation @s pn_accel_x *= @s pn_effective_closing
+scoreboard players operation @s pn_accel_x /= #pn_closing_scale pn_scale
 
-scoreboard players operation @s pn_accel_y *= @s pn_closing_speed
-scoreboard players operation @s pn_accel_y /= #pn_output_scale pn_scale
+scoreboard players operation @s pn_accel_y *= @s pn_effective_closing
+scoreboard players operation @s pn_accel_y /= #pn_closing_scale pn_scale
 
-scoreboard players operation @s pn_accel_z *= @s pn_closing_speed
-scoreboard players operation @s pn_accel_z /= #pn_output_scale pn_scale
+scoreboard players operation @s pn_accel_z *= @s pn_effective_closing
+scoreboard players operation @s pn_accel_z /= #pn_closing_scale pn_scale
 
 
 # ============================================================
-# NAVIGATION GAIN / TURN SCALE
-# ============================================================
-#
-# #pn_navigation_gain = 4000
-# #pn_turn_scale     = 5000
-#
-# This gives an effective gain of approximately:
-#
-#   4000 / 5000 = 0.8
-#
-# Smaller #pn_turn_scale values produce stronger steering.
-#
+# APPLY NAVIGATION GAIN TO PN
 # ============================================================
 
 scoreboard players operation @s pn_accel_x *= #pn_navigation_gain pn_scale
-scoreboard players operation @s pn_accel_x /= #pn_turn_scale pn_scale
+scoreboard players operation @s pn_accel_x /= #pn_direction_scale pn_scale
 
 scoreboard players operation @s pn_accel_y *= #pn_navigation_gain pn_scale
-scoreboard players operation @s pn_accel_y /= #pn_turn_scale pn_scale
+scoreboard players operation @s pn_accel_y /= #pn_direction_scale pn_scale
 
 scoreboard players operation @s pn_accel_z *= #pn_navigation_gain pn_scale
-scoreboard players operation @s pn_accel_z /= #pn_turn_scale pn_scale
+scoreboard players operation @s pn_accel_z /= #pn_direction_scale pn_scale
+
+
+# ============================================================
+# PURSUIT CORRECTION
+# ============================================================
+#
+# When PN is operating normally, this is deliberately modest.
+#
+# When the missile is opening:
+#
+#   Rhat - Vhat
+#
+# produces a correction toward the target.
+#
+# This prevents a moving target from causing the missile to
+# become permanently ballistic.
+#
+# ============================================================
+
+
+# ------------------------------------------------------------
+# X
+# ------------------------------------------------------------
+
+scoreboard players operation @s pn_pursuit_x = @s pn_los_dir_x
+scoreboard players operation @s pn_pursuit_x -= @s pn_dir_x
+
+
+# ------------------------------------------------------------
+# Y
+# ------------------------------------------------------------
+
+scoreboard players operation @s pn_pursuit_y = @s pn_los_dir_y
+scoreboard players operation @s pn_pursuit_y -= @s pn_dir_y
+
+
+# ------------------------------------------------------------
+# Z
+# ------------------------------------------------------------
+
+scoreboard players operation @s pn_pursuit_z = @s pn_los_dir_z
+scoreboard players operation @s pn_pursuit_z -= @s pn_dir_z
+
+
+# ============================================================
+# SCALE PURSUIT CORRECTION
+# ============================================================
+#
+# Pursuit should become stronger as closing becomes worse.
+#
+# We use the minimum-closing floor to avoid enormous values.
+#
+# The fallback is intentionally modest so normal PN remains
+# the dominant interception mechanism.
+#
+# ============================================================
+
+execute if score @s pn_closing_speed matches ..-1 run scoreboard players operation @s pn_pursuit_x *= #pn_pursuit_gain pn_scale
+execute if score @s pn_closing_speed matches ..-1 run scoreboard players operation @s pn_pursuit_x /= #pn_direction_scale pn_scale
+
+execute if score @s pn_closing_speed matches ..-1 run scoreboard players operation @s pn_pursuit_y *= #pn_pursuit_gain pn_scale
+execute if score @s pn_closing_speed matches ..-1 run scoreboard players operation @s pn_pursuit_y /= #pn_direction_scale pn_scale
+
+execute if score @s pn_closing_speed matches ..-1 run scoreboard players operation @s pn_pursuit_z *= #pn_pursuit_gain pn_scale
+execute if score @s pn_closing_speed matches ..-1 run scoreboard players operation @s pn_pursuit_z /= #pn_direction_scale pn_scale
+
+
+# ============================================================
+# ADD PURSUIT TO PN ACCELERATION
+# ============================================================
+
+execute if score @s pn_closing_speed matches ..-1 run scoreboard players operation @s pn_accel_x += @s pn_pursuit_x
+execute if score @s pn_closing_speed matches ..-1 run scoreboard players operation @s pn_accel_y += @s pn_pursuit_y
+execute if score @s pn_closing_speed matches ..-1 run scoreboard players operation @s pn_accel_z += @s pn_pursuit_z
 
 
 # ============================================================

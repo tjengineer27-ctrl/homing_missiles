@@ -82,7 +82,39 @@ scoreboard objectives add pn_scale dummy
 
 scoreboard objectives add pn_closing_speed dummy
 
-scoreboard players set #pn_closing_scale pn_scale 100
+# ============================================================
+# PN WORKING RANGE VECTOR
+# ============================================================
+#
+# guidance_dx/dy/dz are stored at 1000× block precision.
+#
+# PN reduces them to 100× precision:
+#
+#   1000 / 10 = 100
+#
+# This prevents large dot/cross-product values from overflowing
+# the scoreboard integer range.
+#
+# ============================================================
+
+scoreboard objectives add pn_work_x dummy
+scoreboard objectives add pn_work_y dummy
+scoreboard objectives add pn_work_z dummy
+
+scoreboard players set #pn_range_scale pn_scale 10
+
+scoreboard objectives add pn_effective_closing dummy
+
+scoreboard objectives add pn_los_dir_x dummy
+scoreboard objectives add pn_los_dir_y dummy
+scoreboard objectives add pn_los_dir_z dummy
+
+scoreboard objectives add pn_pursuit_x dummy
+scoreboard objectives add pn_pursuit_y dummy
+scoreboard objectives add pn_pursuit_z dummy
+
+scoreboard players set #pn_min_closing pn_scale 100
+scoreboard players set #pn_pursuit_gain pn_scale 1500
 
 scoreboard players set #pn_navigation_gain pn_scale 4000
 scoreboard players set #pn_rate_scale pn_scale 1000
@@ -120,7 +152,6 @@ scoreboard objectives add pn_dy dummy
 scoreboard objectives add pn_dz dummy
 
 scoreboard objectives add pn_range_sq dummy
-scoreboard objectives add pn_closing_speed dummy
 
 # Newly calculated direction
 
