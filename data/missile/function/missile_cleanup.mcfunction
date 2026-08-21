@@ -9,6 +9,12 @@
 execute as @e[type=minecraft:marker,tag=missile_tracker] if score @s tracker_controller_id = #active_controller controller_id run kill @s
 
 # ------------------------------------------------------------
+# REMOVE THIS MISSILE'S ORIENTATION MARKER
+# ------------------------------------------------------------
+
+execute as @e[type=minecraft:marker,tag=missile_orientation] if score @s orientation_controller_id = #active_controller controller_id run kill @s
+
+# ------------------------------------------------------------
 # REMOVE THIS MISSILE'S VISUAL FIREWORK
 # ------------------------------------------------------------
 

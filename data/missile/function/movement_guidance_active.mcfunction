@@ -6,7 +6,7 @@
 # HOMING MISSILE - ACTIVE PN MOVEMENT DEBUG
 # ============================================================
 
-tellraw @a [{"text":"[ACTIVE MOVEMENT ENTERED] ","color":"green"},{"text":"Controller ","color":"yellow"},{"score":{"name":"@s","objective":"controller_id"}}]
+# tellraw @a [{"text":"[ACTIVE MOVEMENT ENTERED] ","color":"green"},{"text":"Controller ","color":"yellow"},{"score":{"name":"@s","objective":"controller_id"}}]
 
 # ------------------------------------------------------------
 # COPY CURRENT NORMALIZED DIRECTION
@@ -18,7 +18,48 @@ scoreboard players operation @s pn_new_z = @s pn_dir_z
 
 
 # ------------------------------------------------------------
-# APPLY PN CORRECTION
+# APPLY FORWARD MOTION RETENTION
+# ------------------------------------------------------------
+#
+# Preserve a portion of the missile's existing heading before
+# applying the PN steering correction.
+#
+# #pn_forward_retention:
+#
+#     1000 = 100% forward retention
+#      750 = 75% forward retention
+#      500 = 50% forward retention
+#
+# This prevents the PN correction from completely replacing
+# the missile's forward flight direction.
+#
+# ------------------------------------------------------------
+
+scoreboard players operation @s pn_new_x *= #pn_forward_retention pn_scale
+scoreboard players operation @s pn_new_x /= #pn_direction_scale pn_scale
+
+scoreboard players operation @s pn_new_y *= #pn_forward_retention pn_scale
+scoreboard players operation @s pn_new_y /= #pn_direction_scale pn_scale
+
+scoreboard players operation @s pn_new_z *= #pn_forward_retention pn_scale
+scoreboard players operation @s pn_new_z /= #pn_direction_scale pn_scale
+
+
+# ------------------------------------------------------------
+# APPLY PN CORRECTION WITH TURN-RATE LIMIT
+# ------------------------------------------------------------
+#
+# Start from the missile's current heading.
+#
+# pn_accel_* represents the desired PN steering correction.
+# #pn_turn_scale controls how strongly that correction can
+# influence the heading during a single tick.
+#
+# A larger #pn_turn_scale = slower turning.
+# A smaller #pn_turn_scale = faster turning.
+#
+# This preserves forward motion instead of allowing PN to
+# completely replace the missile's existing heading.
 # ------------------------------------------------------------
 
 scoreboard players operation #pn_math pn_scale = @s pn_accel_x
@@ -54,7 +95,7 @@ execute if score #pn_math pn_scale > @s pn_new_scale run scoreboard players oper
 
 
 # ------------------------------------------------------------
-# NORMALIZE
+# NORMALIZE NEW HEADING
 # ------------------------------------------------------------
 
 execute if score @s pn_new_scale matches 1.. run scoreboard players operation @s pn_new_x *= #pn_direction_scale pn_scale
@@ -88,7 +129,7 @@ scoreboard players operation @s pn_move_z /= #pn_direction_scale pn_scale
 # MOVEMENT DEBUG
 # ============================================================
 
-tellraw @a [{"text":"[MOVE DEBUG] ","color":"gold"},{"text":"Controller ","color":"yellow"},{"score":{"name":"@s","objective":"controller_id"}},{"text":" | DIR: "},{"score":{"name":"@s","objective":"pn_new_x"}},{"text":" / "},{"score":{"name":"@s","objective":"pn_new_y"}},{"text":" / "},{"score":{"name":"@s","objective":"pn_new_z"}},{"text":" | SPEED: "},{"score":{"name":"@s","objective":"pn_speed_scale"}},{"text":" | MOVE: "},{"score":{"name":"@s","objective":"pn_move_x"}},{"text":" / "},{"score":{"name":"@s","objective":"pn_move_y"}},{"text":" / "},{"score":{"name":"@s","objective":"pn_move_z"}}]
+# tellraw @a [{"text":"[MOVE DEBUG] ","color":"gold"},{"text":"Controller ","color":"yellow"},{"score":{"name":"@s","objective":"controller_id"}},{"text":" | DIR: "},{"score":{"name":"@s","objective":"pn_new_x"}},{"text":" / "},{"score":{"name":"@s","objective":"pn_new_y"}},{"text":" / "},{"score":{"name":"@s","objective":"pn_new_z"}},{"text":" | SPEED: "},{"score":{"name":"@s","objective":"pn_speed_scale"}},{"text":" | MOVE: "},{"score":{"name":"@s","objective":"pn_move_x"}},{"text":" / "},{"score":{"name":"@s","objective":"pn_move_y"}},{"text":" / "},{"score":{"name":"@s","objective":"pn_move_z"}}]
 
 
 # ============================================================

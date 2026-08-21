@@ -30,6 +30,8 @@ execute as @e[type=minecraft:marker,tag=missile_controller,tag=!tracker_created]
 # The tracker receives that target's permanent target_id.
 # This prevents the missile from independently choosing the
 # nearest valid target.
+#
+# ------------------------------------------------------------
 
 execute as @e[type=minecraft:marker,tag=missile_controller,tag=!tracker_created] at @s if entity @e[type=#missile:valid_targets,tag=crosshair_target,limit=1] run scoreboard players operation @e[type=minecraft:marker,tag=missile_tracker,distance=..1,limit=1,sort=nearest] tracker_target = @e[type=#missile:valid_targets,tag=crosshair_target,limit=1] target_id
 

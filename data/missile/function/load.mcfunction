@@ -135,15 +135,24 @@ scoreboard players set #negative_one pn_scale -1
 scoreboard players set #pn_direction_scale pn_scale 1000
 scoreboard players set #pn_math pn_scale 1
 
-# IMPORTANT:
+# IMPORTANT: Turn Scale Values
 # Smaller value = stronger steering response.
 #
 # 1000  = very weak
 # 100   = useful initial testing value
 # 50    = stronger
 # 25    = very strong
+#
+# Forward Retention Values
+#
+# 900 = very strong forward retention
+# 750 = good starting point
+# 500 = more aggressive turning
+# 250 = very little forward retention
 
-scoreboard players set #pn_turn_scale pn_scale 5000
+scoreboard players set #pn_turn_scale pn_scale 750
+
+scoreboard players set #pn_forward_retention pn_scale 750
 
 
 # ============================================================
