@@ -88,12 +88,7 @@ scoreboard objectives add pn_closing_speed dummy
 #
 # guidance_dx/dy/dz are stored at 1000× block precision.
 #
-# PN reduces them to 100× precision:
-#
-#   1000 / 10 = 100
-#
-# This prevents large dot/cross-product values from overflowing
-# the scoreboard integer range.
+# PN uses the full-precision vector for LOS calculations.
 #
 # ============================================================
 
@@ -120,6 +115,16 @@ scoreboard players set #pn_navigation_gain pn_scale 4000
 scoreboard players set #pn_rate_scale pn_scale 1000
 scoreboard players set #pn_output_scale pn_scale 1000000
 
+# Closing-speed normalization.
+#
+# pn_accel is produced from a 1000-scaled direction vector
+# and pn_effective_closing is also represented in scaled units.
+#
+# 1000 keeps the resulting acceleration in the same general
+# fixed-point scale as the direction vector.
+
+scoreboard players set #pn_closing_scale pn_scale 1000
+
 scoreboard objectives add pn_speed_scale dummy
 
 scoreboard objectives add pn_dir_x dummy
@@ -133,7 +138,7 @@ scoreboard players set #pn_math pn_scale 1
 # IMPORTANT:
 # Smaller value = stronger steering response.
 #
-# 1000  = very weak / often rounds away
+# 1000  = very weak
 # 100   = useful initial testing value
 # 50    = stronger
 # 25    = very strong

@@ -16,9 +16,6 @@
 # The missile also receives a pursuit correction when closing
 # velocity is low or negative.
 #
-# This prevents PN from completely shutting off when the
-# missile is temporarily opening from a moving target.
-#
 # ============================================================
 
 
@@ -34,6 +31,44 @@ scoreboard players operation @s guidance_rel_vy -= @s guidance_prev_dy
 
 scoreboard players operation @s guidance_rel_vz = @s guidance_dz
 scoreboard players operation @s guidance_rel_vz -= @s guidance_prev_dz
+
+
+# ============================================================
+# REDUCE PN WORKING VECTOR
+# ============================================================
+#
+# guidance_dx/dy/dz:
+#
+#     blocks × 1000
+#
+# PN working vector:
+#
+#     blocks × 100
+#
+# ============================================================
+
+scoreboard players operation @s pn_work_x = @s pn_dx
+scoreboard players operation @s pn_work_x /= #pn_range_scale pn_scale
+
+scoreboard players operation @s pn_work_y = @s pn_dy
+scoreboard players operation @s pn_work_y /= #pn_range_scale pn_scale
+
+scoreboard players operation @s pn_work_z = @s pn_dz
+scoreboard players operation @s pn_work_z /= #pn_range_scale pn_scale
+
+# ============================================================
+# REDUCE RELATIVE MOVEMENT
+# ============================================================
+#
+# guidance_rel_v* is stored at 1000× precision.
+#
+# Reduce it to the same 100× working scale as pn_work_*.
+#
+# ============================================================
+
+scoreboard players operation @s guidance_rel_vx /= #pn_range_scale pn_scale
+scoreboard players operation @s guidance_rel_vy /= #pn_range_scale pn_scale
+scoreboard players operation @s guidance_rel_vz /= #pn_range_scale pn_scale
 
 
 # ============================================================
@@ -63,16 +98,24 @@ scoreboard players set @s pn_pursuit_z 0
 # ============================================================
 # CALCULATE LOS RANGE SQUARED
 # ============================================================
+#
+# Uses the reduced 100× PN working vector.
+#
+#   |R|² = Rx² + Ry² + Rz²
+#
+# ============================================================
 
-scoreboard players operation @s pn_range_sq = @s pn_dx
-scoreboard players operation @s pn_range_sq *= @s pn_dx
+scoreboard players operation @s pn_range_sq = @s pn_work_x
+scoreboard players operation @s pn_range_sq *= @s pn_work_x
 
-scoreboard players operation #pn_math pn_scale = @s pn_dy
-scoreboard players operation #pn_math pn_scale *= @s pn_dy
+scoreboard players operation #pn_math pn_scale = @s pn_work_y
+scoreboard players operation #pn_math pn_scale *= @s pn_work_y
+
 scoreboard players operation @s pn_range_sq += #pn_math pn_scale
 
-scoreboard players operation #pn_math pn_scale = @s pn_dz
-scoreboard players operation #pn_math pn_scale *= @s pn_dz
+scoreboard players operation #pn_math pn_scale = @s pn_work_z
+scoreboard players operation #pn_math pn_scale *= @s pn_work_z
+
 scoreboard players operation @s pn_range_sq += #pn_math pn_scale
 
 
@@ -82,7 +125,7 @@ scoreboard players operation @s pn_range_sq += #pn_math pn_scale
 #
 # |R| ≈ max(|Rx|, |Ry|, |Rz|)
 #
-# pn_dx / pn_dy / pn_dz use approximately 100x block scale.
+# pn_work_x/y/z use approximately 100× block scale.
 #
 # ============================================================
 
@@ -93,7 +136,7 @@ scoreboard players set #pn_math pn_range 0
 # ABSOLUTE X
 # ------------------------------------------------------------
 
-scoreboard players operation #pn_math pn_component = @s pn_dx
+scoreboard players operation #pn_math pn_component = @s pn_work_x
 
 execute if score #pn_math pn_component matches ..-1 run scoreboard players operation #pn_math pn_component *= #negative_one pn_scale
 
@@ -104,7 +147,7 @@ execute if score #pn_math pn_component > #pn_math pn_range run scoreboard player
 # ABSOLUTE Y
 # ------------------------------------------------------------
 
-scoreboard players operation #pn_math pn_component = @s pn_dy
+scoreboard players operation #pn_math pn_component = @s pn_work_y
 
 execute if score #pn_math pn_component matches ..-1 run scoreboard players operation #pn_math pn_component *= #negative_one pn_scale
 
@@ -115,7 +158,7 @@ execute if score #pn_math pn_component > #pn_math pn_range run scoreboard player
 # ABSOLUTE Z
 # ------------------------------------------------------------
 
-scoreboard players operation #pn_math pn_component = @s pn_dz
+scoreboard players operation #pn_math pn_component = @s pn_work_z
 
 execute if score #pn_math pn_component matches ..-1 run scoreboard players operation #pn_math pn_component *= #negative_one pn_scale
 
@@ -134,15 +177,15 @@ execute if score #pn_math pn_component > #pn_math pn_range run scoreboard player
 #
 # ============================================================
 
-execute if score #pn_math pn_range matches 1.. run scoreboard players operation @s pn_los_dir_x = @s pn_dx
+execute if score #pn_math pn_range matches 1.. run scoreboard players operation @s pn_los_dir_x = @s pn_work_x
 execute if score #pn_math pn_range matches 1.. run scoreboard players operation @s pn_los_dir_x *= #pn_direction_scale pn_scale
 execute if score #pn_math pn_range matches 1.. run scoreboard players operation @s pn_los_dir_x /= #pn_math pn_range
 
-execute if score #pn_math pn_range matches 1.. run scoreboard players operation @s pn_los_dir_y = @s pn_dy
+execute if score #pn_math pn_range matches 1.. run scoreboard players operation @s pn_los_dir_y = @s pn_work_y
 execute if score #pn_math pn_range matches 1.. run scoreboard players operation @s pn_los_dir_y *= #pn_direction_scale pn_scale
 execute if score #pn_math pn_range matches 1.. run scoreboard players operation @s pn_los_dir_y /= #pn_math pn_range
 
-execute if score #pn_math pn_range matches 1.. run scoreboard players operation @s pn_los_dir_z = @s pn_dz
+execute if score #pn_math pn_range matches 1.. run scoreboard players operation @s pn_los_dir_z = @s pn_work_z
 execute if score #pn_math pn_range matches 1.. run scoreboard players operation @s pn_los_dir_z *= #pn_direction_scale pn_scale
 execute if score #pn_math pn_range matches 1.. run scoreboard players operation @s pn_los_dir_z /= #pn_math pn_range
 
@@ -152,6 +195,9 @@ execute if score #pn_math pn_range matches 1.. run scoreboard players operation 
 # ============================================================
 #
 # Vclose = -(R · ΔR) / |R|
+#
+# Both R and ΔR are now operating at approximately 100×
+# block precision.
 #
 # IMPORTANT:
 # We deliberately DO NOT clamp negative values here.
@@ -164,15 +210,17 @@ execute if score #pn_math pn_range matches 1.. run scoreboard players operation 
 #
 # ============================================================
 
-scoreboard players operation @s pn_closing_speed = @s pn_dx
+scoreboard players operation @s pn_closing_speed = @s pn_work_x
 scoreboard players operation @s pn_closing_speed *= @s guidance_rel_vx
 
-scoreboard players operation #pn_math pn_component = @s pn_dy
+scoreboard players operation #pn_math pn_component = @s pn_work_y
 scoreboard players operation #pn_math pn_component *= @s guidance_rel_vy
+
 scoreboard players operation @s pn_closing_speed += #pn_math pn_component
 
-scoreboard players operation #pn_math pn_component = @s pn_dz
+scoreboard players operation #pn_math pn_component = @s pn_work_z
 scoreboard players operation #pn_math pn_component *= @s guidance_rel_vz
+
 scoreboard players operation @s pn_closing_speed += #pn_math pn_component
 
 scoreboard players operation @s pn_closing_speed *= #negative_one pn_scale
@@ -219,6 +267,8 @@ execute if score @s pn_effective_closing matches ..99 run scoreboard players ope
 #   Y = Rz*ΔRx - Rx*ΔRz
 #   Z = Rx*ΔRy - Ry*ΔRx
 #
+# R uses the reduced pn_work_* vector.
+#
 # ============================================================
 
 
@@ -226,10 +276,10 @@ execute if score @s pn_effective_closing matches ..99 run scoreboard players ope
 # X
 # ------------------------------------------------------------
 
-scoreboard players operation @s pn_los_x = @s pn_dy
+scoreboard players operation @s pn_los_x = @s pn_work_y
 scoreboard players operation @s pn_los_x *= @s guidance_rel_vz
 
-scoreboard players operation #pn_math pn_scale = @s pn_dz
+scoreboard players operation #pn_math pn_scale = @s pn_work_z
 scoreboard players operation #pn_math pn_scale *= @s guidance_rel_vy
 
 scoreboard players operation @s pn_los_x -= #pn_math pn_scale
@@ -239,10 +289,10 @@ scoreboard players operation @s pn_los_x -= #pn_math pn_scale
 # Y
 # ------------------------------------------------------------
 
-scoreboard players operation @s pn_los_y = @s pn_dz
+scoreboard players operation @s pn_los_y = @s pn_work_z
 scoreboard players operation @s pn_los_y *= @s guidance_rel_vx
 
-scoreboard players operation #pn_math pn_scale = @s pn_dx
+scoreboard players operation #pn_math pn_scale = @s pn_work_x
 scoreboard players operation #pn_math pn_scale *= @s guidance_rel_vz
 
 scoreboard players operation @s pn_los_y -= #pn_math pn_scale
@@ -252,10 +302,10 @@ scoreboard players operation @s pn_los_y -= #pn_math pn_scale
 # Z
 # ------------------------------------------------------------
 
-scoreboard players operation @s pn_los_z = @s pn_dx
+scoreboard players operation @s pn_los_z = @s pn_work_x
 scoreboard players operation @s pn_los_z *= @s guidance_rel_vy
 
-scoreboard players operation #pn_math pn_scale = @s pn_dy
+scoreboard players operation #pn_math pn_scale = @s pn_work_y
 scoreboard players operation #pn_math pn_scale *= @s guidance_rel_vx
 
 scoreboard players operation @s pn_los_z -= #pn_math pn_scale
@@ -263,6 +313,25 @@ scoreboard players operation @s pn_los_z -= #pn_math pn_scale
 
 # ============================================================
 # CONVERT R × ΔR INTO SCALED LOS ANGULAR RATE
+# ============================================================
+#
+# pn_work_x/y/z and guidance_rel_v* both use approximately
+# 100× block precision.
+#
+# Therefore:
+#
+#   R × ΔR
+#
+# is approximately 10,000× scaled.
+#
+# Dividing by:
+#
+#   |R|²
+#
+# leaves the angular-rate component in approximately 1× scale.
+#
+# We then multiply by the desired PN rate scale.
+#
 # ============================================================
 
 execute if score @s pn_range_sq matches 1.. run scoreboard players operation @s pn_los_x *= #pn_rate_scale pn_scale
